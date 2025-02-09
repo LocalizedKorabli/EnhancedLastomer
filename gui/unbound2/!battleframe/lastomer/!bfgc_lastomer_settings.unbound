@@ -9,13 +9,15 @@
 #----------------------
 (def constant BFGC_LASTOMER_COLOR	
 {
-        'purple': 		'0xBD97EB',		
-        'cyan': 		'0x47CFE3',		
-        'green': 		'0x2EAF32',	
-        'lightgreen':	'0x2ED832',		
-        'yellow': 		'0xFFE85B',		
-        'red':			'0xFE4D2A',		
-        'white': 		'0xEEEEEE'						
+	'purple': 		'0x800080',
+	'magenta': 		'0xEB00EB',
+	'cyan': 		'0x47CFE3',
+	'green': 		'0x2EAF32',
+	'lime': 		'0x7FD82E',
+	'yellow': 		'0xFFE85B',
+	'orange': 		'0xFE7903',
+	'red': 			'0xFE4D2A',	
+	'white': 		'0xEEEEEE'
 })
 #----------------------
 #	Сокращение классов

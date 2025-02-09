@@ -188,22 +188,26 @@
 		(var ShipTypeDamage:number = "isSubmarine ? '-' : Lastomer[ShipType+'_battle_damage']")
 																			
 		(var ProAlfaColorName:str = "
-			 Lastomer.all_rate > 1770 	? 	'purple' : 
-			 Lastomer.all_rate > 1327 	? 	'cyan' :
-			 Lastomer.all_rate > 1025 	? 	'green' :
-			 Lastomer.all_rate > 927 	? 	'lightgreen' :
-			 Lastomer.all_rate > 720 	? 	'yellow' :
-			 Lastomer.all_rate > 500 	? 	'red' : 
+			Lastomer.all_rate > 2450 	? 	'purple' :
+			Lastomer.all_rate > 2100 	? 	'magenta':
+			Lastomer.all_rate > 1750 	? 	'cyan' :
+			Lastomer.all_rate > 1550 	? 	'green' :
+			Lastomer.all_rate > 1350 	? 	'lime' :
+			Lastomer.all_rate > 1100 	? 	'yellow' :
+			Lastomer.all_rate > 750 	? 	'orange' :
+			Lastomer.all_rate > 0 	? 		'red' : 
 											'white'
 		")
 																								
 		(var ProAlfaShipColorName:str = "
-			 ShipTypeAlfa > 1770 	? 	'purple' : 
-			 ShipTypeAlfa > 1327 	? 	'cyan' :
-			 ShipTypeAlfa > 1025 	? 	'green' :
-			 ShipTypeAlfa > 927 	? 	'lightgreen' :
-			 ShipTypeAlfa > 720 	? 	'yellow' :
-			 ShipTypeAlfa > 500 	? 	'red' : 
+			 ShipTypeAlfa > 2450 	? 	'purple' :
+			 ShipTypeAlfa > 2100 	? 	'magenta':
+			 ShipTypeAlfa > 1750 	? 	'cyan' :
+			 ShipTypeAlfa > 1550 	? 	'green' :
+			 ShipTypeAlfa > 1350 	? 	'lime' :
+			 ShipTypeAlfa > 1100 	? 	'yellow' :
+			 ShipTypeAlfa > 750 	? 	'orange' :
+			 ShipTypeAlfa > 0 		? 	'red' : 
 										'white'
 		")
 																								
@@ -211,7 +215,7 @@
 			 LastomerShipsPerBattle > 1.26 	? 	'purple' : 
 			 LastomerShipsPerBattle > 1.02 	? 	'cyan' :
 			 LastomerShipsPerBattle > 0.77 	? 	'green' :
-			 LastomerShipsPerBattle > 0.57 	? 	'lightgreen' :
+			 LastomerShipsPerBattle > 0.57 	? 	'lime' :
 			 LastomerShipsPerBattle > 0.37 	? 	'yellow' :
 			 LastomerShipsPerBattle > 0.1 	? 	'red' : 
 												'white'
@@ -221,7 +225,7 @@
 			 Lastomer.all_kill_dead > 2.39 	? 	'purple' : 
 			 Lastomer.all_kill_dead > 1.67 	? 	'cyan' :
 			 Lastomer.all_kill_dead > 1.09 	? 	'green' :
-			 Lastomer.all_kill_dead > 0.56 	? 	'lightgreen' :
+			 Lastomer.all_kill_dead > 0.56 	? 	'lime' :
 			 Lastomer.all_kill_dead > 0.42 	? 	'yellow' :
 			 Lastomer.all_kill_dead > 0.1 	? 	'red' : 
 											    'white'
@@ -244,11 +248,13 @@
 		
 																								
 		(var survivedColor:str = "
-			 survived > 60 	? 	'purple' : 
-			 survived > 50 	? 	'cyan' :
-			 survived > 40 	? 	'green' :
-			 survived > 30 	? 	'lightgreen' :
-			 survived > 20 	? 	'yellow' :
+			 survived > 70 	? 	'purple' : 
+			 survived > 60 	? 	'magenta' :
+			 survived > 55 	? 	'cyan' :
+			 survived > 50 	? 	'green' :
+			 survived > 40 	? 	'lime' :
+			 survived > 30 	? 	'yellow' :
+			 survived > 20 	? 	'orange' :
 			 survived > 10 	? 	'red' : 
 								'white'
 		")
@@ -658,22 +664,26 @@
 		
 		
 		(var winrateColorName:str = "
-			 Lastomer.wins_percent > 61.7 	? 'purple' : 
-			 Lastomer.wins_percent > 56.8 	? 'cyan' :
-			 Lastomer.wins_percent > 51.88 	? 'green' :
-			 Lastomer.wins_percent > 47.65 	? 'lightgreen' :
-			 Lastomer.wins_percent > 42.55 	? 'yellow' :
-			 Lastomer.wins_percent > 39 	? 'red' : 
-											  'white'
+			Lastomer.wins_percent > 70 	? 'purple' : 
+			 Lastomer.wins_percent > 62 	? 'magenta' :
+			 Lastomer.wins_percent > 58 	? 'cyan' :
+			 Lastomer.wins_percent > 54 	? 'green' :
+			 Lastomer.wins_percent > 50 	? 'lime' :
+			 Lastomer.wins_percent > 45 	? 'yellow' :
+			 Lastomer.wins_percent > 41 	? 'orange' :
+			 Lastomer.wins_percent > 0 		? 'red' : 
+											'white'
 		")
 																								
 		(var ProAlfaColorName:str = "
-			 Lastomer.all_rate > 1770 	? 	'purple' : 
-			 Lastomer.all_rate > 1327 	? 	'cyan' :
-			 Lastomer.all_rate > 1025 	? 	'green' :
-			 Lastomer.all_rate > 927 	? 	'lightgreen' :
-			 Lastomer.all_rate > 720 	? 	'yellow' :
-			 Lastomer.all_rate > 500 	? 	'red' : 
+			Lastomer.all_rate > 2450 	? 	'purple' :
+			Lastomer.all_rate > 2100 	? 	'magenta':
+			Lastomer.all_rate > 1750 	? 	'cyan' :
+			Lastomer.all_rate > 1550 	? 	'green' :
+			Lastomer.all_rate > 1350	? 	'lime' :
+			Lastomer.all_rate > 1100 	? 	'yellow' :
+			Lastomer.all_rate > 750 	? 	'orange' :
+			Lastomer.all_rate > 0 		? 	'red' : 
 											'white'
 		")
 		
@@ -703,7 +713,7 @@
 			(bind scaleY "0.4")
 			(bind alpha "dataOpacity * 0.7")
 		
-		(bind backgroundImage "'url:../unbound2/!battleframe/lastomer/images/rate_'+winrateColorName+'.png'")
+		(bind backgroundImage "'url:../unbound2/!battleframe/lastomer/images/rate_'+ProAlfaColorName+'.png'")
 		)
 	)
 	(block
