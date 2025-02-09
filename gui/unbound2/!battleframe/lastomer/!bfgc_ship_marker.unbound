@@ -1,0 +1,758 @@
+(def css $FontShadowBF ()
+	(filters 
+		(dropShadow
+			(distance = 0)
+			(angle = 90)
+			(color = 0x000000)
+			(alpha = 0.8)
+			(blurX = 4.5)
+			(blurY = 2.5)
+			(strength = 0.9)
+			(quality = 2)
+		)
+	)
+)
+(def css $WorldMarkerTextBF ()
+	(fontFamily = '$WWSDefaultFontBold')
+	(extends $WorldMarkerTextItemShadowFilter)
+	(extends $FontEnableReadability)
+	(extends $FontEnableReadability)
+	(extends $FontShadowBF)
+)
+(def css $WorldMarkerTextItemShadowFilterBF ()
+	(extends $FontFamilyDefaultBold)
+	(extends $FontColorWhite)
+	(extends $TextMouseDisable)
+
+	(fontSize = 15)
+	(filters 
+		(dropShadow 
+			(distance = 0.1)
+			(angle = 90)
+			(color = 0x000000)
+			(alpha = 1.0)
+			(blurX = 2.0)
+			(blurY = 2.0)
+			(strength = 0.7)
+			(quality = 1)
+		)
+	)
+)
+
+
+(def layout BFGC_WorldShipMarker (_markerEntity:gfx)
+	(scope
+
+		(event evMarkerShow)
+		(event evMarkerHide)
+		(event evUpdateRotation)
+
+		
+		(var timer:gfx = "$datahub.getSingleComponent(CC.timer)")
+		(macro GET_MARKER_ENTITY_COMPONENT 'avatar')
+		(macro GET_MARKER_ENTITY_COMPONENT 'distance')
+		(macro GET_MARKER_ENTITY_COMPONENT 'health')
+		(macro GET_MARKER_ENTITY_COMPONENT 'relation')
+		(macro GET_MARKER_ENTITY_COMPONENT 'target')
+		(macro GET_MARKER_ENTITY_COMPONENT 'mapPosition')
+		(macro GET_MARKER_ENTITY_COMPONENT 'dissolve')
+
+		
+		(macro ALT_VISION_SCOPE)
+		(macro IS_ON_PLANE)
+
+		
+		(dispatch evUpdateRotation args={} (event "timer.evFrequent") (bind enabled "isTactical"))
+
+		
+		(var targetFlags:number = "targetComponent ? targetComponent.flags : 0" (event "targetComponent.evChanged") (event "targetComponent.evFlagsChanged"))
+		(var isTargetLocked:bool = "(targetFlags & LOCKABLE_WEAPONS) > 0")
+		(var distanceIndex:number = "distanceComponent ? distanceComponent.distanceIndex : SC.Battle.DISTANCE_TYPE.NEAR" (event "distanceComponent.evDistanceIndexChanged"))
+		(var relationValue:number = "relationComponent ? relationComponent.value : -1" (event "relationComponent.evChanged"))
+
+
+		(var isBot:bool = "(avatarComponent ? avatarComponent.isBot : false) || _markerEntity.hasComponent(CC.bot)")
+
+
+		
+		(var isSelf:bool = "relationValue == SC.Battle.PLAYER_RELATION.SELF")
+		(var isEnemy:bool = "relationValue == SC.Battle.PLAYER_RELATION.ENEMY")
+		(var isAlive:bool = "healthComponent && healthComponent.isAlive" (event "healthComponent.evIsAliveChanged"))
+		(var distanceType:number = "isTactical || (isOnPlane && isSelf)		? SC.Battle.DISTANCE_TYPE.TACTICAL :
+									isTargetLocked || isFullAltVisionMode 	? SC.Battle.DISTANCE_TYPE.NEAR
+																			: distanceIndex")
+
+		(var farAdaptiveAltVisionMode:bool = "isAdaptiveAltVisionMode && distanceType <= SC.Battle.DISTANCE_TYPE.FAR")
+		
+		(var innerVisible:bool = "ownCarrierEntity && isSelf ? (isTactical || isOnPlane) : true")
+		
+		(macro GET_UPREFS)
+        (var lastomer_showOnTactical:bool = "uPrefsBool['bfgc_lastomer_showOnTactical']")
+        (var lastomer_showOnAlt:bool = "uPrefsBool['bfgc_lastomer_showOnAlt']")
+		
+		(var shipNameItemVisibility:bool = "((distanceType == SC.Battle.DISTANCE_TYPE.TACTICAL && isAdaptiveAltVisionMode) || farAdaptiveAltVisionMode) && !(isSelf && isTactical)")
+		
+        (var showOnAlt:bool = "shipNameItemVisibility && lastomer_showOnAlt && altVision")
+        (var showOnTactical:bool = "shipNameItemVisibility && lastomer_showOnTactical && isTactical && !lastomer_showOnAlt")
+        (var showDefault:bool = "shipNameItemVisibility && !isTactical && !lastomer_showOnAlt")
+		
+		
+		(var playerName:str = "avatarComponent ? avatarComponent.pureName : ''")
+		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
+		(var Lastomer:dict = "battleDataEntity.dataComponent.data.lastomer[playerName]")
+		
+		(var cmdEntity:gfx = "$datahub.getPrimaryEntity(CC.commandMappingCommandName, 'CMD_VOICE_CHAT_TALK')")
+		(var extraData:bool = "false")
+		(bind extraData "!extraData" init=false (event "!extraData ? cmdEntity.commandMappingCommand.evCall : cameraEntity.camera.evAltVisionChanged"))
+		(var isExtraData:bool = "altVision && extraData")
+		
+		
+	)
+
+	(dispatch evMarkerShow args="{}" on='addedToStage')
+
+	(style
+		(width = 0) (height = 0)
+		(bind align "isTactical ? center|middle
+								: center|bottom")
+	)
+
+	(bind visible "innerVisible")
+	(alpha = "isSelf ? 1 : 0")
+
+	(controller $Animation
+		(bindcall play	duration="DEATH_ANIMATION_DURATION"
+						from="{alpha: 0}"
+						to="{alpha: 1}"
+						init=false
+						watch=false
+						action="killAll"
+						reverse="!(isAlive)"
+						(bind trigger "isAlive")
+		)
+
+		(macro MARKER_DISSOLVE_BINDCALL_ANIMATION "!(isSelf)")
+	)
+
+	
+	(block
+		(element LastomerMainItem "_markerEntity" "Lastomer"
+			(bind visible "!(Lastomer.ishidden) && (Lastomer && !isBot) && (showDefault || showOnAlt || showOnTactical)")
+			#(bind visible "1")
+			(macro BIND_SCALE "distanceType == SC.Battle.DISTANCE_TYPE.FARTHEST ? 0.7 : 1")
+		)
+	)
+
+	
+	(block
+		(element LastomerExtItem "_markerEntity" "Lastomer"
+			(bind visible "(Lastomer && !isBot) && !(Lastomer.ishidden) && isExtraData && (showDefault || showOnAlt || showOnTactical)")
+			#(bind visible "1")
+			(macro BIND_SCALE "distanceType == SC.Battle.DISTANCE_TYPE.FARTHEST ? 0.7 : 1")
+		)
+	)
+
+	
+)
+
+(def element LastomerExtItem (_markerEntity:gfx, Lastomer:dict) layout=true
+	(scope
+		
+		(macro GET_MARKER_ENTITY_COMPONENT 'avatar')
+		(macro ALT_VISION_SCOPE)
+
+		(var subtypeShip:gfx = "avatarComponent.ship.ref.ship.subtype")
+		(var isBot:bool = "avatarComponent ? avatarComponent.isBot : true")
+		(var cameraEntity:gfx = "$datahub.getSingleEntity(CC.camera)")
+		(var isTactical:bool = "cameraEntity.camera.isTactical" (event "cameraEntity.camera.evTacticalStateChanged"))
+		
+		(var isSubmarine:bool = "subtypeShip == 'Submarine'")
+		
+		(var ShipType:str = "BFGC_LASTOMER_SHIPLIST[toLower(subtypeShip)]")
+		
+		(macro GET_UPREFS)
+		
+        (var data2Opacity:number = "!isIn(toString(uPrefsNum['bfgc_lastomer_stats2Opacity']), ['null', 'undefined']) ? uPrefsNum['bfgc_lastomer_stats2Opacity']/100 : 1")
+        (var data2Scale:number = "uPrefsNum['bfgc_lastomer_stats2Scale'] ? uPrefsNum['bfgc_lastomer_stats2Scale']/100 : 1.2")
+		
+		
+		(var LastomerCeilDMG:number = "ceil(Lastomer.all_damage/Lastomer.all_battles_count)")
+		(var LastomerTotalKills:number = "Lastomer.all_kill_dead * (Lastomer.all_battles_count - Lastomer.all_survived)")
+		(var LastomerShipsPerBattle:number = "LastomerTotalKills / Lastomer.all_battles_count")
+						
+		(var battles_count_not_pl:number = "Lastomer.em_battles_count + Lastomer.kp_battles_count + Lastomer.lk_battles_count + Lastomer.av_battles_count")
+		(var pl_battles_count:number = "Lastomer.all_battles_count - battles_count_not_pl")
+		
+		(var ShipTypeAlfa:number = "isSubmarine ? '-' : Lastomer[ShipType+'_rate']")
+		(var ShipTypeBattles:number = "isSubmarine ? pl_battles_count : Lastomer[ShipType+'_battles_count']")
+		(var ShipTypeDamage:number = "isSubmarine ? '-' : Lastomer[ShipType+'_battle_damage']")
+																			
+		(var ProAlfaColorName:str = "
+			 Lastomer.all_rate > 1770 	? 	'purple' : 
+			 Lastomer.all_rate > 1327 	? 	'cyan' :
+			 Lastomer.all_rate > 1025 	? 	'green' :
+			 Lastomer.all_rate > 927 	? 	'lightgreen' :
+			 Lastomer.all_rate > 720 	? 	'yellow' :
+			 Lastomer.all_rate > 500 	? 	'red' : 
+											'white'
+		")
+																								
+		(var ProAlfaShipColorName:str = "
+			 ShipTypeAlfa > 1770 	? 	'purple' : 
+			 ShipTypeAlfa > 1327 	? 	'cyan' :
+			 ShipTypeAlfa > 1025 	? 	'green' :
+			 ShipTypeAlfa > 927 	? 	'lightgreen' :
+			 ShipTypeAlfa > 720 	? 	'yellow' :
+			 ShipTypeAlfa > 500 	? 	'red' : 
+										'white'
+		")
+																								
+		(var ShipsPerBattleColorName:str = "
+			 LastomerShipsPerBattle > 1.26 	? 	'purple' : 
+			 LastomerShipsPerBattle > 1.02 	? 	'cyan' :
+			 LastomerShipsPerBattle > 0.77 	? 	'green' :
+			 LastomerShipsPerBattle > 0.57 	? 	'lightgreen' :
+			 LastomerShipsPerBattle > 0.37 	? 	'yellow' :
+			 LastomerShipsPerBattle > 0.1 	? 	'red' : 
+												'white'
+		")
+																								
+		(var KDColorName:str = "
+			 Lastomer.all_kill_dead > 2.39 	? 	'purple' : 
+			 Lastomer.all_kill_dead > 1.67 	? 	'cyan' :
+			 Lastomer.all_kill_dead > 1.09 	? 	'green' :
+			 Lastomer.all_kill_dead > 0.56 	? 	'lightgreen' :
+			 Lastomer.all_kill_dead > 0.42 	? 	'yellow' :
+			 Lastomer.all_kill_dead > 0.1 	? 	'red' : 
+											    'white'
+		")
+		
+		(var ProAlfaColor:number = "BFGC_LASTOMER_COLOR[ProAlfaColorName]")
+		(var ProAlfaShipColor:number = "BFGC_LASTOMER_COLOR[ProAlfaShipColorName]")
+		
+		(var KDColor:number = "BFGC_LASTOMER_COLOR[KDColorName]")
+		(var ShipsPerBattleColor:number = "BFGC_LASTOMER_COLOR[ShipsPerBattleColorName]")
+		
+		(var em_sector:number = "Lastomer.em_battles_count * 360 / Lastomer.all_battles_count")
+		(var kp_sector:number = "Lastomer.kp_battles_count * 360 / Lastomer.all_battles_count")
+		(var lk_sector:number = "Lastomer.lk_battles_count * 360 / Lastomer.all_battles_count")
+		(var av_sector:number = "Lastomer.av_battles_count * 360 / Lastomer.all_battles_count")
+		(var pl_sector:number = "pl_battles_count * 360 / Lastomer.all_battles_count")
+		
+		
+		(var survived:str = "formatFloatingPoint(Lastomer.all_survived/Lastomer.all_battles_count*100, 1) + '%'")
+		
+																								
+		(var survivedColor:str = "
+			 survived > 60 	? 	'purple' : 
+			 survived > 50 	? 	'cyan' :
+			 survived > 40 	? 	'green' :
+			 survived > 30 	? 	'lightgreen' :
+			 survived > 20 	? 	'yellow' :
+			 survived > 10 	? 	'red' : 
+								'white'
+		")
+		
+		)
+		
+		
+
+		(style
+			(position = "absolute")
+			#(bind top "isTactical ? '-18' : '-4'")
+			#(bind left "isTactical ? '-25' : '-14'")
+			(bind alpha "data2Opacity * 0.99")
+			(bind scaleX "isTactical ? 0.85 : (data2Scale)")
+			(bind scaleY "isTactical ? 0.85 : (data2Scale)")
+			
+			(bind top "isTactical ? '-8' : (data2Scale*10 - 16)")
+			(bind left "isTactical ? '-20' : -12")
+		)
+
+		
+    (block
+		(style
+			(position = "absolute")
+			(bind left "-15")
+			(bind top "-10")
+			(bind alpha "1")
+			(bind scaleX "0.7")
+			(bind scaleY "0.7")
+			(bind backgroundImage "'url:../unbound2/!battleframe/lastomer/images/ext_stat_bg.png'")
+		)
+	)
+	(block
+		(style
+			(position = "absolute")
+			(align = "left")
+			(bind left "80")
+			(bind top "-4")
+		)
+		(block
+			(style
+				(bind alpha "1")
+				(bind scaleX "0.8")
+				(bind scaleY "0.8")
+				(bind backgroundImage "'url:../service_kit/training_room/icon_in_training_battle.png'")
+			)
+		)
+		(block
+			(style
+				(align = "left")
+				(marginLeft = "20")
+				(marginTop = "-2")
+			)
+
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 15)
+					(textAlign = "left")
+					(bind textColor "0xEEEEEE")
+				)
+				(bind text "Lastomer.all_battles_count")
+			)
+		)
+	)
+	(block
+		(style
+			(position = "absolute")
+			(align = "left")
+			(bind left "180")
+			(bind top "-4")
+		)
+		(block
+			(style
+				(bind alpha "1")
+				(bind scaleX "1.4")
+				(bind scaleY "1.4")
+				(marginTop = "-10")
+				(bind backgroundImage "'swf:../service_kit/ship_classes/svg/svg.swf:icon_default_' + toLower(subtypeShip)")
+			)
+		)
+		(block
+			(style
+				(align = "left")
+				(marginLeft = "12")
+				(marginTop = "8")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 15)
+					(textAlign = "left")
+					(marginLeft = "25")
+					(bind textColor "0xEEEEEE")
+				)
+				(bind text "ShipTypeBattles")
+			)
+		)
+	)
+	(block
+		(style
+			(position = "absolute")
+			(bind rotation "- 90")
+			(align = "left")
+			(bind left "254")
+			(bind top "88")
+			(bind alpha "0.8")
+		)
+		
+		
+		(block
+			(controller $Sector
+				(bind arc "em_sector")
+				(bind radius "32")
+				(bind innerRadius "0")
+				(bind color "0x90BA3C")
+				(bind lineColor "0x90BA3C")
+			)
+		)
+		(block
+			(style (bind rotation "em_sector") )
+			(controller $Sector
+				(bind arc "kp_sector")
+				(bind radius "32")
+				(bind innerRadius "0")
+				(bind color "0x3497DA")
+				(bind lineColor "0x3497DA")
+			)
+		)
+		(block
+			(style (bind rotation "em_sector + kp_sector") )
+			(controller $Sector
+				(bind arc "lk_sector")
+				(bind radius "32")
+				(bind innerRadius "0")
+				(bind color "0xD04841")
+				(bind lineColor "0xD04841")
+			)
+		)
+		(block
+			(style (bind rotation "em_sector + kp_sector + lk_sector") )
+			(controller $Sector
+				(bind arc "av_sector")
+				(bind radius "32")
+				(bind innerRadius "0")
+				(bind color "0xFFE066")
+				(bind lineColor "0xFFE066")
+			)
+		)
+		(block
+			(style (bind rotation "em_sector + kp_sector + lk_sector + av_sector") )
+			(controller $Sector
+				(bind arc "pl_sector")
+				(bind radius "32")
+				(bind innerRadius "0")
+				(bind color "0x6f4c4c")
+				(bind lineColor "0x6f4c4c")
+			)
+		)
+	)
+		
+	(block
+		(style
+			(position = "absolute")
+			(align = "left")
+			(bind left "48")
+			(bind top "16")
+		)
+
+		(block
+			(style
+				(position = "absolute")
+				(align = "left")
+				(bind left "30")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+			(class $DamageCounterDropShadowFilter)
+				(style
+					(fontSize = 12)
+					(textAlign = "left")
+					(bind textColor "0xEEEEEE")
+				)
+				(bind text "tr('IDS_BFGC_LM_AVERDMG')")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 12)
+					(textAlign = "left")
+					(marginTop = "-2")
+					(bind textColor "0xEEEEEE")
+				)
+				(bind text "tr('IDS_BFGC_LM_PROALFA')")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 12)
+					(textAlign = "left")
+					(marginTop = "-2")
+					(bind textColor "0xEEEEEE")
+				)
+				(bind text "tr('IDS_BFGC_LM_FRAGS')")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 12)
+					(textAlign = "left")
+					(marginTop = "-2")
+					(bind textColor "0xEEEEEE")
+				)
+				(bind text "tr('IDS_BFGC_LM_KD')")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 12)
+					(textAlign = "left")
+					(marginTop = "-2")
+					(bind textColor "0xEEEEEE")
+				)
+				(bind text "' '")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 12)
+					(textAlign = "left")
+					(marginTop = "-2")
+					(bind textColor "0xEEEEEE")
+				)
+				(bind text "tr('IDS_BFGC_LM_ALIVE')")
+			)
+		)
+
+		(block
+			(style
+				(position = "absolute")
+				(align = "left")
+				(bind left "92")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 13)
+					(textAlign = "left")
+					(bind textColor "0xEEEEEE")
+				)
+				(bind text "LastomerCeilDMG ? LastomerCeilDMG : 0")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 13)
+					(textAlign = "left")
+					(marginTop = "-3")
+					(bind textColor "ProAlfaColor")
+				)
+				(bind text "Lastomer.all_rate")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 13)
+					(textAlign = "left")
+					(marginTop = "-3")
+					(bind textColor "ShipsPerBattleColor")
+				)
+				(bind text "formatFloatingPoint(LastomerShipsPerBattle, 2)")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 13)
+					(textAlign = "left")
+					(marginTop = "-4")
+					(bind textColor "KDColor")
+				)
+				(bind text "formatFloatingPoint(Lastomer.all_kill_dead, 2)")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 13)
+					(textAlign = "left")
+					(marginTop = "-3")
+					(bind textColor "BFGC_LASTOMER_COLOR[survivedColor]")
+				)
+				(bind text "' '")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 13)
+					(textAlign = "left")
+					(marginTop = "-3")
+					(bind textColor "BFGC_LASTOMER_COLOR[survivedColor]")
+				)
+				(bind text "survived")
+			)
+		)
+	)
+	
+	
+		
+	(block
+		(style
+			(position = "absolute")
+			(align = "left")
+			(bind left "48")
+			(bind top "16")
+		)
+
+		(block
+			(style
+				(position = "absolute")
+				(align = "left")
+				(alpha = "0.7")
+				(bind left "140")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+			(class $DamageCounterDropShadowFilter)
+				(style
+					(fontSize = 12)
+					(textAlign = "left")
+					(bind textColor "0xEEEEEE")
+				)
+				(bind text "tr('IDS_BFGC_LM_ON'+toUpper(subtypeShip))")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 12)
+					(textAlign = "left")
+					(marginTop = "-2")
+					(bind textColor "0xEEEEEE")
+				)
+				(bind text "tr('IDS_BFGC_LM_ON'+toUpper(subtypeShip))")
+			)
+		)
+
+		(block
+			(style
+				(position = "absolute")
+				(align = "left")
+				(bind left "199")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 13)
+					(textAlign = "left")
+					(bind textColor "0xEEEEEE")
+				)
+				(bind text "isSubmarine ? '-' : ShipTypeDamage ? ShipTypeDamage : 0")
+			)
+			(tf
+				(class $WorldMarkerTextItemShadowFilterBF)
+				(style
+					(fontSize = 13)
+					(textAlign = "left")
+					(marginTop = "-3")
+					(bind textColor "ProAlfaShipColor")
+				)
+				(bind text "isSubmarine ? '-' : ShipTypeAlfa ? ShipTypeAlfa : 0")
+			)
+		)
+	)
+	
+)
+
+
+(def element LastomerMainItem (_markerEntity:gfx, Lastomer:dict) layout=true
+	(scope
+		
+		(macro GET_MARKER_ENTITY_COMPONENT 'avatar')
+		(macro ALT_VISION_SCOPE)
+
+		(var subtypeShip:gfx = "avatarComponent.ship.ref.ship.subtype")
+		(var isBot:bool = "avatarComponent ? avatarComponent.isBot : true")
+		(var cameraEntity:gfx = "$datahub.getSingleEntity(CC.camera)")
+		(var isTactical:bool = "cameraEntity.camera.isTactical" (event "cameraEntity.camera.evTacticalStateChanged"))
+		
+		(var isSubmarine:bool = "subtypeShip == 'Submarine'")
+		
+		(macro GET_UPREFS)
+		
+        (var lastomer_calibration:bool = "uPrefsBool['bfgc_lastomer_calibration']")
+        (var lastomer_Xpos:number = "(!isIn(toString(uPrefsNum['bfgc_lastomer_Xpos']), ['null', 'undefined']) && lastomer_calibration) ? uPrefsNum['bfgc_lastomer_Xpos'] : 0")
+        (var lastomer_Ypos:number = "(!isIn(toString(uPrefsNum['bfgc_lastomer_Ypos']), ['null', 'undefined']) && lastomer_calibration) ? uPrefsNum['bfgc_lastomer_Ypos'] : 0")
+        (var dataOpacity:number = "!isIn(toString(uPrefsNum['bfgc_lastomer_statsOpacity']), ['null', 'undefined']) ? uPrefsNum['bfgc_lastomer_statsOpacity']/100 : 1")
+		
+		
+        (var lastomer_showicons:bool = "uPrefsBool['bfgc_lastomer_showicons']")
+		(var lastomer_icons2data:bool = "uPrefsBool['bfgc_lastomer_icons2data'] == true || (uPrefsBool['bfgc_lastomer_icons2data'] == null && BFGC_LASTOMER_OPTIONS['MAIN'][1]['isActivated'] == true)")
+		
+        (var lastomer_roundWR:bool = "uPrefsBool['bfgc_lastomer_roundWR']")
+		
+		
+        (var icons2data:bool = "lastomer_icons2data && altVision")
+        (var elements_close:bool = "lastomer_Xpos < '-17'")
+        (var elements_closePA:bool = "lastomer_Xpos < '-10'")
+		
+		
+		
+		(var winrateColorName:str = "
+			 Lastomer.wins_percent > 61.7 	? 'purple' : 
+			 Lastomer.wins_percent > 56.8 	? 'cyan' :
+			 Lastomer.wins_percent > 51.88 	? 'green' :
+			 Lastomer.wins_percent > 47.65 	? 'lightgreen' :
+			 Lastomer.wins_percent > 42.55 	? 'yellow' :
+			 Lastomer.wins_percent > 39 	? 'red' : 
+											  'white'
+		")
+																								
+		(var ProAlfaColorName:str = "
+			 Lastomer.all_rate > 1770 	? 	'purple' : 
+			 Lastomer.all_rate > 1327 	? 	'cyan' :
+			 Lastomer.all_rate > 1025 	? 	'green' :
+			 Lastomer.all_rate > 927 	? 	'lightgreen' :
+			 Lastomer.all_rate > 720 	? 	'yellow' :
+			 Lastomer.all_rate > 500 	? 	'red' : 
+											'white'
+		")
+		
+		(var WinRateColor:number = "BFGC_LASTOMER_COLOR[winrateColorName]")
+		(var ProAlfaColor:number = "BFGC_LASTOMER_COLOR[ProAlfaColorName]")
+		(var SeparatColor:number = "0xEEEEEE")
+	
+	(var alignTop:number = "isSubmarine 
+											? isTactical ? '-66' : '-72'
+											: isTactical ? '-61' : '-66'")
+											
+	(var minusXpos:number = "lastomer_roundWR 
+											? '-7'
+											: 0")
+											
+	(var Rwins_percent:str = "round(Lastomer.wins_percent)")
+											
+	)
+	
+    (block
+		(bind visible "lastomer_showicons && (!icons2data)")
+		(style
+			(position = "absolute")
+			(bind left "isTactical ? '-11' : (-32 - (lastomer_Xpos ? lastomer_Xpos-2 : 0)")
+			(bind top "isTactical ? alignTop : (alignTop + lastomer_Ypos)")
+			(bind scaleX "0.4")
+			(bind scaleY "0.4")
+			(bind alpha "dataOpacity * 0.7")
+		
+		(bind backgroundImage "'url:../unbound2/!battleframe/lastomer/images/rate_'+winrateColorName+'.png'")
+		)
+	)
+	(block
+		(style (bind alpha "dataOpacity")) 
+			   (bind visible "!lastomer_showicons || icons2data")
+				(position = "absolute")
+		(tf
+			(class $WorldMarkerTextBF)
+			(style
+				(position = "absolute")
+				(bind right "isTactical ? '10' : (15 + lastomer_Xpos - minusXpos)")
+				(bind top "isTactical ? alignTop : (alignTop + lastomer_Ypos)")
+				(fontSize = 12)
+				(textAlign = "right")
+				(bind textColor "WinRateColor")
+			)
+			(bind text "(lastomer_roundWR ? Rwins_percent : formatFloatingPoint(Lastomer.wins_percent, 2))  + '%'")
+			#(bind text "(lastomer_roundWR ? '42' : '41.82')  + '%'")
+		)
+		(tf
+			(bind visible "!isTactical && elements_close")
+			(class $WorldMarkerTextBF)
+			(style
+				(position = "absolute")
+				(bind left "2 + minusXpos + (Lastomer.all_rate <1000 ? 2 : 0)")
+				(bind top "isTactical ? alignTop : (alignTop + lastomer_Ypos)")
+				(bind alpha "0.7")
+				(fontSize = 12)
+				(textAlign = "center")
+				(bind textColor "SeparatColor")
+			)
+			(bind text "'/'")
+		)
+		(tf
+			(class $WorldMarkerTextBF)
+			(style
+				(position = "absolute")
+				#(bind left "isTactical ? '15' : (15 + lastomer_Xpos + (elements_closePA ? minusXpos : 0) + (495 <1000 ? 5 : 12))")
+				(bind left "isTactical ? '15' : (27 + lastomer_Xpos + (elements_closePA ? (Lastomer.all_rate > 1000 ? minusXpos : minusXpos+3) : -5)")
+				(bind top "isTactical ? alignTop : (alignTop + lastomer_Ypos)")
+				(fontSize = 12)
+				(textAlign = "left")
+				(bind textColor "ProAlfaColor")
+			)
+			(bind text "Lastomer.all_rate ? Lastomer.all_rate : '—'")
+			#(bind text "'495'")
+		)
+	)
+)
+
+
+
