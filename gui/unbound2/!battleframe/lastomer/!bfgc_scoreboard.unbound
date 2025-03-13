@@ -123,7 +123,7 @@
 		(style
 			(position = "absolute") 
 			(top = "-2px")         		
-			(left = "-7px")         
+			(left = "-6px")         
 			(alpha = "!Lastomer.ishidden ? 0.8 : 0.6")     
 		)
 		(.graphics

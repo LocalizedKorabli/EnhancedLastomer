@@ -333,7 +333,7 @@
 				(bind scaleX "1.4")
 				(bind scaleY "1.4")
 				(marginTop = "-10")
-				(bind backgroundImage "'swf:../service_kit/ship_classes/svg/svg.swf:icon_default_' + toLower(subtypeShip)")
+				(bind backgroundImage "'swf:../service_kit/ship_classes_svg/ship_classes_svg.swf:icon_default_' + toLower(subtypeShip)")
 			)
 		)
 		(block
