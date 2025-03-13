@@ -102,9 +102,9 @@
 		
 		
 		(var winrateColorName:str = "
-			 Lastomer.wins_percent > 61.7 	? 'purple' : 
-			 Lastomer.wins_percent > 56.8 	? 'cyan' :
-			 Lastomer.wins_percent > 51.88 	? 'green' :
+			 Lastomer.wins_percent > 61.75 	? 'purple' : 
+			 Lastomer.wins_percent > 56.84 	? 'cyan' :
+			 Lastomer.wins_percent > 51.9 	? 'green' :
 			 Lastomer.wins_percent > 47.65 	? 'lightgreen' :
 			 Lastomer.wins_percent > 42.55 	? 'yellow' :
 			 Lastomer.wins_percent > 39 	? 'red' : 
@@ -120,7 +120,7 @@
 		(style
 			(position = "absolute") 
 			(top = "-2px")         		
-			(left = "-7px")         
+			(left = "-6px")         
 			(alpha = "!Lastomer.ishidden ? 0.8 : 0.6")     
 		)
 		(.graphics

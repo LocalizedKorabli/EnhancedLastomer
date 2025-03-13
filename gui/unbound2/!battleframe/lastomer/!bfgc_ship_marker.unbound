@@ -189,7 +189,7 @@
 																			
 		(var ProAlfaColorName:str = "
 			 Lastomer.all_rate > 1770 	? 	'purple' : 
-			 Lastomer.all_rate > 1327 	? 	'cyan' :
+			 Lastomer.all_rate > 1328 	? 	'cyan' :
 			 Lastomer.all_rate > 1025 	? 	'green' :
 			 Lastomer.all_rate > 927 	? 	'lightgreen' :
 			 Lastomer.all_rate > 720 	? 	'yellow' :
@@ -199,7 +199,7 @@
 																								
 		(var ProAlfaShipColorName:str = "
 			 ShipTypeAlfa > 1770 	? 	'purple' : 
-			 ShipTypeAlfa > 1327 	? 	'cyan' :
+			 ShipTypeAlfa > 1328 	? 	'cyan' :
 			 ShipTypeAlfa > 1025 	? 	'green' :
 			 ShipTypeAlfa > 927 	? 	'lightgreen' :
 			 ShipTypeAlfa > 720 	? 	'yellow' :
@@ -658,9 +658,9 @@
 		
 		
 		(var winrateColorName:str = "
-			 Lastomer.wins_percent > 61.7 	? 'purple' : 
-			 Lastomer.wins_percent > 56.8 	? 'cyan' :
-			 Lastomer.wins_percent > 51.88 	? 'green' :
+			 Lastomer.wins_percent > 61.75 	? 'purple' : 
+			 Lastomer.wins_percent > 56.84 	? 'cyan' :
+			 Lastomer.wins_percent > 51.9 	? 'green' :
 			 Lastomer.wins_percent > 47.65 	? 'lightgreen' :
 			 Lastomer.wins_percent > 42.55 	? 'yellow' :
 			 Lastomer.wins_percent > 39 	? 'red' : 
@@ -669,7 +669,7 @@
 																								
 		(var ProAlfaColorName:str = "
 			 Lastomer.all_rate > 1770 	? 	'purple' : 
-			 Lastomer.all_rate > 1327 	? 	'cyan' :
+			 Lastomer.all_rate > 1328 	? 	'cyan' :
 			 Lastomer.all_rate > 1025 	? 	'green' :
 			 Lastomer.all_rate > 927 	? 	'lightgreen' :
 			 Lastomer.all_rate > 720 	? 	'yellow' :
