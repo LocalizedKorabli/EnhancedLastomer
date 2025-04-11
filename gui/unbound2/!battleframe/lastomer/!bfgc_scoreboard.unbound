@@ -28,78 +28,20 @@
 )
 
 
-(def element BFGC_PlayerNameAndClanTagLastomer (	_isSelf:bool=false, _isAbuser:bool=false, _ctkStatus:bool=false, _isPremiumAccount:bool=false,
-									_isInSameDivision:bool=false, _fontSize:number=15, _playerName:str='', _clanTag:str='', _clanTagColor:str='',
-									_noClanTagColor:bool=false, _isBot:bool=false, _isSuspended:bool=false, _isTextBold:bool=false, _isInPostBattle:bool=false)
+(def element BFGC_PlayerLastomerIndicator (_playerName:str='', _isInPostBattle:bool=false, _isBot:bool=false)
 	(scope
-		(macro PULL_PLAYER_COLOR
-			_isSelf = "_isSelf"
-			_isAbuser = "_isAbuser"
-			_ctkStatus = "_ctkStatus"
-			_isPremiumAccount = "_isPremiumAccount"
-			_isInSameDivision = "_isInSameDivision"
-		)
-
-		(var clanTagColor:str = "'0xff' + _clanTagColor")
-		(var haveClanTag:bool = "_clanTag && !_clanTag.empty")
-		(var isColoredClanTag:bool = "haveClanTag && !_noClanTagColor && _clanTagColor	")
-
-		(var playerName:str = "	isColoredClanTag 	? _playerName :
-								haveClanTag			? ('[' + _clanTag + ']' + _playerName)
-													: _playerName")
-	)
-
-	(style
-		(hitTest = false)
-		(flow = "horizontal")
-		(width = 100%)
-	)
-
-	(element BFGC_PlayerLastomerIndicator _playerName="_playerName" _isInPostBattle="_isInPostBattle")
-	
-	(tf
-		(bind visible "isColoredClanTag")
-
-		(bind class "_isTextBold ? '$TextDefaultBoldNM' : '$TextDefaultNM'")
-		(style
-			(marginRight = 6px)
-			(wordWrap = false)
-			(bind fontSize "_fontSize")
-			(bind textColor "clanTagColor")
-		)
-
-		(bind text "'[' + _clanTag + ']'")
-	)
-
-	
-	(tf
-		(bind class "_isTextBold ? '$TextDefaultBoldNM' : '$TextDefaultNM'")
-		(style
-			(wordWrap = false)
-			(elideMode = true)
-			(width = 100%)
-			(bind fontSize "_fontSize")
-			(bind noTranslate "_isSuspended ? false : !_isBot")
-			(bind textColor "playerNameColor")
-		)
-
-		(bind text "playerName")
-	)
-)
-
-
-(def element BFGC_PlayerLastomerIndicator (_playerName:str='', _isInPostBattle:bool=false)
-	(scope
-		(macro GET_UPREFS)
+		(macro GET_UPREFS2)
 		(var showInScoreboard:bool = "uPrefsBool['bfgc_lastomer_showInScoreboard'] == true || (uPrefsBool['bfgc_lastomer_showInScoreboard'] == null && BFGC_LASTOMER_OPTIONS['MAIN'][8]['isActivated'] == true)")
 		
 		
 		(var Lastomer:dict = [])
 		
-		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")	
+		(var isBot:bool = "avatarEntity.avatar.isBot ?: false")
 		
-		(bind Lastomer "battleDataEntity.hasComponent(CC.dataComponent) ? battleDataEntity.dataComponent.data.lastomer[_playerName] : null" (event "battleDataEntity.evAdded") (event "battleDataEntity.evRemoved") (event "battleDataEntity.dataComponent.evDataChanged"))
-		
+		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
+		(var dataComponent:gfx = "battleDataEntity.dataComponent" (event "battleDataEntity.evAdded") (event "battleDataEntity.evRemoved"))
+		(var data:dict = "dataComponent ? dataComponent.data : {}" (event "dataComponent.evChanged"))
+		(bind Lastomer "data ? data.lastomer[_playerName] : BFGC_LASTOMER_DEFDATA" (event "battleDataEntity.evAdded") (event "battleDataEntity.evRemoved") (event "battleDataEntity.dataComponent.evDataChanged"))
 		
 		(var winrateColorName:str = "
 			 Lastomer.wins_percent > 61.75 	? 'purple' : 
@@ -130,6 +72,64 @@
 			(endFill)
 		)
 	(bind colorTransform "!Lastomer.ishidden ? setColorTransform : setColorHidden")
+)
 
 
+(def element BFGC_PlayerNameAndClanTagLastomer (	_isSelf:bool=false, _isAbuser:bool=false, _ctkStatus:bool=false, _isPremiumAccount:bool=false,
+									_isInSameDivision:bool=false, _fontSize:number=15, _playerName:str='', _clanTag:str='', _clanTagColor:str='',
+									_noClanTagColor:bool=false, _isBot:bool=false, _isSuspended:bool=false, _isTextBold:bool=false, _isInPostBattle:bool=false)
+	(scope
+		(macro PULL_PLAYER_COLOR
+			_isSelf = "_isSelf"
+			_isAbuser = "_isAbuser"
+			_ctkStatus = "_ctkStatus"
+			_isPremiumAccount = "_isPremiumAccount"
+			_isInSameDivision = "_isInSameDivision"
+		)
+
+		(var clanTagColor:str = "'0xff' + _clanTagColor")
+		(var haveClanTag:bool = "_clanTag && !_clanTag.empty")
+		(var isColoredClanTag:bool = "haveClanTag && !_noClanTagColor && _clanTagColor	")
+
+		(var playerName:str = "	isColoredClanTag 	? _playerName :
+								haveClanTag			? ('[' + _clanTag + ']' + _playerName)
+													: _playerName")
+	)
+
+	(style
+		(hitTest = false)
+		(flow = "horizontal")
+		(width = 100%)
+	)
+
+	(element BFGC_PlayerLastomerIndicator _playerName="_playerName" _isInPostBattle="_isInPostBattle"  _isBot="isBot")
+	
+	(tf
+		(bind visible "isColoredClanTag")
+
+		(bind class "_isTextBold ? '$TextDefaultBoldNM' : '$TextDefaultNM'")
+		(style
+			(marginRight = 6px)
+			(wordWrap = false)
+			(bind fontSize "_fontSize")
+			(bind textColor "clanTagColor")
+		)
+
+		(bind text "'[' + _clanTag + ']'")
+	)
+
+	
+	(tf
+		(bind class "_isTextBold ? '$TextDefaultBoldNM' : '$TextDefaultNM'")
+		(style
+			(wordWrap = false)
+			(elideMode = true)
+			(width = 100%)
+			(bind fontSize "_fontSize")
+			(bind noTranslate "_isSuspended ? false : !_isBot")
+			(bind textColor "playerNameColor")
+		)
+
+		(bind text "playerName")
+	)
 )

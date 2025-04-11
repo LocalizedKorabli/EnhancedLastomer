@@ -20,7 +20,7 @@
 		(var posX:number = "(stageWidth  - stageWidth + 30)")
 		(var posY:number = "(stageHeight) - 30")
 		
-		(macro GET_UPREFS)
+		(macro GET_UPREFS2)
 		(var currentVersion:str = "uPrefsNum['bfgc_version_lastomer']")
 		(var newVersion:str = "BFGC_VERSION_LASTOMER + 0.00001")
 
@@ -181,7 +181,7 @@
 	(scope
 		(var _entity:gfx = "$datahub.getPrimaryEntity(CC.minimapOption, itemSetting.optionName)")
 		
-		(macro GET_UPREFS)
+		(macro GET_UPREFS2)
 		(var isVisibleIF:bool =	"itemSetting.isVisibleIF ? uPrefsBool[itemSetting.isVisibleIF] : 1")
 		(var notVisibleIF:bool =	"itemSetting.notVisibleIF ? !uPrefsBool[itemSetting.notVisibleIF] : 1")
 	)

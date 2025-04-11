@@ -28,6 +28,39 @@
         'battleship':	'lk',
         'submarine': 	'pl'
 })
+
+
+(def constant BFGC_LASTOMER_DEFDATA
+{
+      'id': 0,
+      'name': '-',
+      'ishidden': true,
+      'clan_id': 0,
+      'clan_tag': '',
+      'karma': 0,
+      'error': 0,
+      'all_battles_count': 0,
+      'all_wins': 0,
+      'all_survived': 0,
+      'all_damage': 0,
+      'all_experience': 0,
+      'all_rate': 0,
+      'all_kill_dead': 0,
+      'av_rate': 0,
+      'lk_rate': 0,
+      'kp_rate': 0,
+      'em_rate': 0,
+      'av_battles_count': 0,
+      'lk_battles_count': 0,
+      'kp_battles_count': 0,
+      'em_battles_count': 0,
+      'av_battle_damage': 0,
+      'lk_battle_damage': 0,
+      'kp_battle_damage': 0,
+      'em_battle_damage': 0,
+      'wins_percent': 0
+})
+
 ##########################
 (def constant BFGC_SETTINGS_LASTOMER_TYPE {
 	CHECKBOX_PREFS: 'BFGC_LastomerOptionsCheckBox',
@@ -41,12 +74,11 @@
 	(var name = "_name + 'B'" type=number value="(_colorNUM) & 255")
 )
 ##########################
-(def macro GET_UPREFS ()
+(def macro GET_UPREFS2 ()
 	(var userPrefsEntity:gfx =  "$datahub.getSingleEntity(CC.userPrefs)")
-	(var _uPrefsNum:bool = "userPrefsEntity.userPrefs.userPrefs.chatBoxWidth" (event "userPrefsEntity.userPrefs.evUserPrefsChanged"))
-	(var uPrefsNum:dict  = "_uPrefsNum ? userPrefsEntity.userPrefs.userPrefs.chatBoxWidth : {}" (event "userPrefsEntity.userPrefs.evUserPrefsChanged"))
-	(var _uPrefsBool:bool = "userPrefsEntity.userPrefs.userPrefs.elementsGroupExpand" (event "userPrefsEntity.userPrefs.evUserPrefsChanged"))
-	(var uPrefsBool:dict  = "_uPrefsBool ? userPrefsEntity.userPrefs.userPrefs.elementsGroupExpand : {}" (event "userPrefsEntity.userPrefs.evUserPrefsChanged"))
+	(var _userPrefs:gfx = "userPrefsEntity.userPrefs.userPrefs" (event "userPrefsEntity.userPrefs.evUserPrefsChanged"))
+	(var uPrefsNum:dict  = "_userPrefs.chatBoxWidth ?: {}" (event "userPrefsEntity.userPrefs.evUserPrefsChanged"))
+	(var uPrefsBool:dict  = "_userPrefs.elementsGroupExpand ?: {}" (event "userPrefsEntity.userPrefs.evUserPrefsChanged"))
 )
 ##########################
 

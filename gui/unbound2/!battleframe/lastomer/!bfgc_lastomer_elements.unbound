@@ -3,9 +3,9 @@
 	(fontSize = 14)
 )
 
-(def element BFGC_LastomerOptionsCheckBox (_entity:gfx, _itemSetting:dict, _enabled:bool=true, _type:str, _baseName:str, _isVisibleIF:bool, _notVisibleIF:bool) layout=true
+(def element BFGC_LastomerOptionsCheckBox (_entity:gfx, _itemSetting:dict={}, _enabled:bool=true, _type:str='', _baseName:str='', _isVisibleIF:bool=true, _notVisibleIF:bool=false) layout=true
 	(scope
-		(macro GET_UPREFS)
+		(macro GET_UPREFS2)
 		(var IDS_LOC:str = "tr('IDS_MENU_SETTINGS') != 'НАСТРОЙКИ' ? '_EN' : ''")
 		
         (var avatarEntity:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
@@ -31,8 +31,8 @@
 			
 	(controller $Tooltip
 		(bind enabled "hasTooltip")
-		(renderer = 'TooltipSystemSimpleTooltip')
-		(args _tooltipText="tr(_itemSetting.text + '_DESC' + IDS_LOC)")
+		(renderer = 'DescriptionTooltip')
+		(args _text="tr(_itemSetting.text + '_DESC' + IDS_LOC)")
 		(align="top|right")
 		(offset=[0, 20])
 		(screenBoundsOffset={left:10, top:10, right:10, bottom:10})
@@ -142,7 +142,7 @@
 (def element BFGC_HotkeyIndicatorWithText (commandId:number, commandId2:number, commandId3:number, toggle:bool=false, fxOnDown:bool=true) layout=true
 	(scope
 		(var textStyleClass:str = "null")
-		(macro GET_UPREFS)
+		(macro GET_UPREFS2)
 		(var IDS_LOC:str = "tr('IDS_MENU_SETTINGS') != 'НАСТРОЙКИ' ? '_EN' : ''")
 	)
 	(bind visible "1")
@@ -238,10 +238,10 @@
 
 
 
-(def element BFGC_LastomerOptionsSlider (_itemSetting:dict, _enabled:bool=true, _isVisibleIF:bool) layout=true
+(def element BFGC_LastomerOptionsSlider (_itemSetting:dict, _enabled:bool=true, _isVisibleIF:bool=false) layout=true
     (scope
         (var enabled:bool = "1")
-		(macro GET_UPREFS)
+		(macro GET_UPREFS2)
 		(var IDS_LOC:str = "tr('IDS_MENU_SETTINGS') != 'НАСТРОЙКИ' ? '_EN' : ''")
 
         (event evSliderValueChanged)

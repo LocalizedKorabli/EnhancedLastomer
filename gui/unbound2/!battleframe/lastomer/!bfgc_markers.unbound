@@ -8,9 +8,20 @@
 		
 		
         (var avatarEntity:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
+		(var isBot:bool = "avatarEntity.avatar.isBot ?: false")
 		(var playerName:str = "avatarEntity.avatar.pureName")
+		
 		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
-		(var Lastomer:dict = "battleDataEntity.dataComponent.data.lastomer[playerName]")
+		(var dataComponent:gfx = "battleDataEntity.dataComponent" (event "battleDataEntity.evAdded") (event "battleDataEntity.evRemoved"))
+		(var data:dict = "dataComponent ? dataComponent.data : {}" (event "dataComponent.evChanged"))
+		(var Lastomer:dict = "data 
+								? data.lastomer[playerName] 
+									? data.lastomer[playerName].ishidden
+										? BFGC_LASTOMER_DEFDATA
+										: data.lastomer[playerName]
+									: BFGC_LASTOMER_DEFDATA
+								: BFGC_LASTOMER_DEFDATA")
+								
 	)
 
 	(style
@@ -52,7 +63,7 @@
 
 (def element BFGC_MyStatPanel(Lastomer:dict, avatarEntity:gfx) layout=true
 	(scope      
-		(macro GET_UPREFS)
+		(macro GET_UPREFS2)
         (var lastomer_showme:bool = "uPrefsBool['bfgc_lastomer_showme']")
         (var lastomer_showmeBG:bool = "uPrefsBool['bfgc_lastomer_showmeBg']")
 		(var isLastomer:bool = "Lastomer")
@@ -95,9 +106,9 @@
 										'white'
 		")
 		
-		(var WinRateColor:number = "BFGC_LASTOMER_COLOR[winrateColorName]")
-		(var ProAlfaColor:number = "BFGC_LASTOMER_COLOR[ProAlfaColorName]")
-		(var ShipTypeAlfaColor:number = "BFGC_LASTOMER_COLOR[ShipTypeAlfaColorName]")
+		(var WinRateColor:number = "toNumber(BFGC_LASTOMER_COLOR[winrateColorName])")
+		(var ProAlfaColor:number = "toNumber(BFGC_LASTOMER_COLOR[ProAlfaColorName])")
+		(var ShipTypeAlfaColor:number = "toNumber(BFGC_LASTOMER_COLOR[ShipTypeAlfaColorName])")
 		
 		
 		(var ShipTypeRate:number = "isSubmarine ? '-' : Lastomer[ShipType+'_rate']")
