@@ -86,7 +86,7 @@
 		
 		(var innerVisible:bool = "ownCarrierEntity && isSelf ? (isTactical || isOnPlane) : true")
 		
-		(macro GET_UPREFS)
+		(macro GET_UPREFS2)
         (var lastomer_showOnTactical:bool = "uPrefsBool['bfgc_lastomer_showOnTactical']")
         (var lastomer_showOnAlt:bool = "uPrefsBool['bfgc_lastomer_showOnAlt']")
 		
@@ -98,8 +98,18 @@
 		
 		
 		(var playerName:str = "avatarComponent ? avatarComponent.pureName : ''")
+
+
 		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
-		(var Lastomer:dict = "battleDataEntity.dataComponent.data.lastomer[playerName]")
+		(var dataComponent:gfx = "battleDataEntity.dataComponent" (event "battleDataEntity.evAdded") (event "battleDataEntity.evRemoved"))
+ 		(var data:dict = "dataComponent ? dataComponent.data : {}" (event "dataComponent.evChanged"))
+ 		(var Lastomer:dict = "data 
+ 								? data.lastomer[playerName] 
+ 									? data.lastomer[playerName].ishidden
+ 										? BFGC_LASTOMER_DEFDATA
+ 										: data.lastomer[playerName]
+ 									: BFGC_LASTOMER_DEFDATA
+ 								: BFGC_LASTOMER_DEFDATA")
 		
 		(var cmdEntity:gfx = "$datahub.getPrimaryEntity(CC.commandMappingCommandName, 'CMD_VOICE_CHAT_TALK')")
 		(var extraData:bool = "false")
@@ -163,14 +173,14 @@
 
 		(var subtypeShip:gfx = "avatarComponent.ship.ref.ship.subtype")
 		(var isBot:bool = "avatarComponent ? avatarComponent.isBot : true")
-		(var cameraEntity:gfx = "$datahub.getSingleEntity(CC.camera)")
-		(var isTactical:bool = "cameraEntity.camera.isTactical" (event "cameraEntity.camera.evTacticalStateChanged"))
+		#(var cameraEntity:gfx = "$datahub.getSingleEntity(CC.camera)")
+		#(var isTactical:bool = "cameraEntity.camera.isTactical" (event "cameraEntity.camera.evTacticalStateChanged"))
 		
 		(var isSubmarine:bool = "subtypeShip == 'Submarine'")
 		
 		(var ShipType:str = "BFGC_LASTOMER_SHIPLIST[toLower(subtypeShip)]")
 		
-		(macro GET_UPREFS)
+		(macro GET_UPREFS2)
 		
         (var data2Opacity:number = "!isIn(toString(uPrefsNum['bfgc_lastomer_stats2Opacity']), ['null', 'undefined']) ? uPrefsNum['bfgc_lastomer_stats2Opacity']/100 : 1")
         (var data2Scale:number = "uPrefsNum['bfgc_lastomer_stats2Scale'] ? uPrefsNum['bfgc_lastomer_stats2Scale']/100 : 1.2")
@@ -231,11 +241,11 @@
 											    'white'
 		")
 		
-		(var ProAlfaColor:number = "BFGC_LASTOMER_COLOR[ProAlfaColorName]")
-		(var ProAlfaShipColor:number = "BFGC_LASTOMER_COLOR[ProAlfaShipColorName]")
+		(var ProAlfaColor:number = "toNumber(BFGC_LASTOMER_COLOR[ProAlfaColorName])")
+ 		(var ProAlfaShipColor:number = "toNumber(BFGC_LASTOMER_COLOR[ProAlfaShipColorName])")
 		
-		(var KDColor:number = "BFGC_LASTOMER_COLOR[KDColorName]")
-		(var ShipsPerBattleColor:number = "BFGC_LASTOMER_COLOR[ShipsPerBattleColorName]")
+		(var KDColor:number = "toNumber(BFGC_LASTOMER_COLOR[KDColorName])")
+ 		(var ShipsPerBattleColor:number = "toNumber(BFGC_LASTOMER_COLOR[ShipsPerBattleColorName])")
 		
 		(var em_sector:number = "Lastomer.em_battles_count * 360 / Lastomer.all_battles_count")
 		(var kp_sector:number = "Lastomer.kp_battles_count * 360 / Lastomer.all_battles_count")
@@ -340,7 +350,7 @@
 			(style
 				(align = "left")
 				(marginLeft = "12")
-				(marginTop = "8")
+				(marginTop = "-2")
 			)
 			(tf
 				(class $WorldMarkerTextItemShadowFilterBF)
@@ -638,12 +648,12 @@
 
 		(var subtypeShip:gfx = "avatarComponent.ship.ref.ship.subtype")
 		(var isBot:bool = "avatarComponent ? avatarComponent.isBot : true")
-		(var cameraEntity:gfx = "$datahub.getSingleEntity(CC.camera)")
-		(var isTactical:bool = "cameraEntity.camera.isTactical" (event "cameraEntity.camera.evTacticalStateChanged"))
+		#(var cameraEntity:gfx = "$datahub.getSingleEntity(CC.camera)")
+		#(var isTactical:bool = "cameraEntity.camera.isTactical" (event "cameraEntity.camera.evTacticalStateChanged"))
 		
 		(var isSubmarine:bool = "subtypeShip == 'Submarine'")
 		
-		(macro GET_UPREFS)
+		(macro GET_UPREFS2)
 		
         (var lastomer_calibration:bool = "uPrefsBool['bfgc_lastomer_calibration']")
         (var lastomer_Xpos:number = "(!isIn(toString(uPrefsNum['bfgc_lastomer_Xpos']), ['null', 'undefined']) && lastomer_calibration) ? uPrefsNum['bfgc_lastomer_Xpos'] : 0")
@@ -687,19 +697,19 @@
 											'white'
 		")
 		
-		(var WinRateColor:number = "BFGC_LASTOMER_COLOR[winrateColorName]")
-		(var ProAlfaColor:number = "BFGC_LASTOMER_COLOR[ProAlfaColorName]")
+		(var WinRateColor:number = "toNumber(BFGC_LASTOMER_COLOR[winrateColorName]) ?: 0")
+ 		(var ProAlfaColor:number = "toNumber(BFGC_LASTOMER_COLOR[ProAlfaColorName]) ?: 0")
 		(var SeparatColor:number = "0xEEEEEE")
 	
 	(var alignTop:number = "isSubmarine 
-											? isTactical ? '-66' : '-72'
-											: isTactical ? '-61' : '-66'")
+											? isTactical ? -66 : -72
+ 											: isTactical ? -61 : -66")
 											
 	(var minusXpos:number = "lastomer_roundWR 
 											? '-7'
 											: 0")
 											
-	(var Rwins_percent:str = "round(Lastomer.wins_percent)")
+	(var Rwins_percent:number = "round(Lastomer.wins_percent)")
 											
 	)
 	
@@ -717,9 +727,9 @@
 		)
 	)
 	(block
-		(style (bind alpha "dataOpacity")) 
+		(style (position = "absolute") (bind alpha "dataOpacity")) 
 			   (bind visible "!lastomer_showicons || icons2data")
-				(position = "absolute")
+
 		(tf
 			(class $WorldMarkerTextBF)
 			(style
