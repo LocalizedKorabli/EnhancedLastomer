@@ -149,7 +149,7 @@
 			isReadOnly: false,
 			isWarn: false,
 			isActivated: true,
-			text:'IDS_BFGC_LM_SHOWINSCOREBOARD',
+			text:'IDS_BFGC_LM_SHOWINSCOREBOARD_PR',
 			tooltip: true
 		},
 		{
