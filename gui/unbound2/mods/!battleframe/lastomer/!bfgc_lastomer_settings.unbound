@@ -69,7 +69,7 @@
 	DIVIDER: 'TooltipSystemHorizontalDivider'
 })
 ##########################
-(def macro HEX_TO_RGB (_colorNUM:expression, _name:expression='color')
+(def macro HEX_TO_RGB_BFLM (_colorNUM:expression, _name:expression='color')
 	(var name = "_name + 'R'" type=number value="(_colorNUM >> 16) & 255")
 	(var name = "_name + 'G'" type=number value="(_colorNUM >> 8) & 255")
 	(var name = "_name + 'B'" type=number value="(_colorNUM) & 255")

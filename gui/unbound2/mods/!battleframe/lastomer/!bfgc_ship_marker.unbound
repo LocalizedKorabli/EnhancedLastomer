@@ -13,7 +13,7 @@
 	)
 )
 (def css $WorldMarkerTextBF ()
-	(fontFamily = '$WWSDefaultFontBold')
+	(fontFamily = '$DefaultFontBold')
 	(extends $WorldMarkerTextItemShadowFilter)
 	(extends $FontEnableReadability)
 	(extends $FontEnableReadability)
@@ -186,9 +186,9 @@
         (var data2Scale:number = "uPrefsNum['bfgc_lastomer_stats2Scale'] ? uPrefsNum['bfgc_lastomer_stats2Scale']/100 : 1.2")
 		
 		
-		(var LastomerCeilDMG:number = "ceil(Lastomer.all_damage/Lastomer.all_battles_count)")
+		(var LastomerCeilDMG:number = "Lastomer.all_battles_count != 0 ? ceil(Lastomer.all_damage/Lastomer.all_battles_count) : 0")
 		(var LastomerTotalKills:number = "Lastomer.all_kill_dead * (Lastomer.all_battles_count - Lastomer.all_survived)")
-		(var LastomerShipsPerBattle:number = "LastomerTotalKills / Lastomer.all_battles_count")
+		(var LastomerShipsPerBattle:number = "Lastomer.all_battles_count != 0 ? (LastomerTotalKills / Lastomer.all_battles_count) : 0")
 						
 		(var battles_count_not_pl:number = "Lastomer.em_battles_count + Lastomer.kp_battles_count + Lastomer.lk_battles_count + Lastomer.av_battles_count")
 		(var pl_battles_count:number = "Lastomer.all_battles_count - battles_count_not_pl")
@@ -247,14 +247,14 @@
 		(var KDColor:number = "toNumber(BFGC_LASTOMER_COLOR[KDColorName])")
  		(var ShipsPerBattleColor:number = "toNumber(BFGC_LASTOMER_COLOR[ShipsPerBattleColorName])")
 		
-		(var em_sector:number = "Lastomer.em_battles_count * 360 / Lastomer.all_battles_count")
-		(var kp_sector:number = "Lastomer.kp_battles_count * 360 / Lastomer.all_battles_count")
-		(var lk_sector:number = "Lastomer.lk_battles_count * 360 / Lastomer.all_battles_count")
-		(var av_sector:number = "Lastomer.av_battles_count * 360 / Lastomer.all_battles_count")
-		(var pl_sector:number = "pl_battles_count * 360 / Lastomer.all_battles_count")
+		(var em_sector:number = "Lastomer.all_battles_count != 0 ? (Lastomer.em_battles_count * 360 / Lastomer.all_battles_count) : 0")
+		(var kp_sector:number = "Lastomer.all_battles_count != 0 ? (Lastomer.kp_battles_count * 360 / Lastomer.all_battles_count) : 0")
+		(var lk_sector:number = "Lastomer.all_battles_count != 0 ? (Lastomer.lk_battles_count * 360 / Lastomer.all_battles_count) : 0")
+		(var av_sector:number = "Lastomer.all_battles_count != 0 ? (Lastomer.av_battles_count * 360 / Lastomer.all_battles_count) : 0")
+		(var pl_sector:number = "Lastomer.all_battles_count != 0 ? (pl_battles_count * 360 / Lastomer.all_battles_count) : 0")
 		
 		
-		(var survived:str = "formatFloatingPoint(Lastomer.all_survived/Lastomer.all_battles_count*100, 1) + '%'")
+		(var survived:str = "(Lastomer.all_battles_count != 0 ? (formatFloatingPoint(Lastomer.all_survived/Lastomer.all_battles_count*100, 1)) : '0') + '%'")
 		
 																								
 		(var survivedColor:str = "
@@ -294,7 +294,7 @@
 			(bind alpha "1")
 			(bind scaleX "0.7")
 			(bind scaleY "0.7")
-			(bind backgroundImage "'url:../unbound2/!battleframe/lastomer/images/ext_stat_bg.png'")
+			(bind backgroundImage "'url:../unbound2/mods/!battleframe/lastomer/images/ext_stat_bg.png'")
 		)
 	)
 	(block
@@ -706,7 +706,7 @@
  											: isTactical ? -61 : -66")
 											
 	(var minusXpos:number = "lastomer_roundWR 
-											? '-7'
+											? -7
 											: 0")
 											
 	(var Rwins_percent:number = "round(Lastomer.wins_percent)")
@@ -717,13 +717,13 @@
 		(bind visible "lastomer_showicons && (!icons2data)")
 		(style
 			(position = "absolute")
-			(bind left "isTactical ? '-11' : (-32 - (lastomer_Xpos ? lastomer_Xpos-2 : 0)")
+			(bind left "isTactical ? '-11' : (-32 - (lastomer_Xpos ? lastomer_Xpos-2 : 0))")
 			(bind top "isTactical ? alignTop : (alignTop + lastomer_Ypos)")
 			(bind scaleX "0.4")
 			(bind scaleY "0.4")
 			(bind alpha "dataOpacity * 0.7")
 		
-		(bind backgroundImage "'url:../unbound2/!battleframe/lastomer/images/rate_'+ProAlfaColorName+'.png'")
+		(bind backgroundImage "'url:../unbound2/mods/!battleframe/lastomer/images/rate_'+ProAlfaColorName+'.png'")
 		)
 	)
 	(block
@@ -762,7 +762,7 @@
 			(style
 				(position = "absolute")
 				#(bind left "isTactical ? '15' : (15 + lastomer_Xpos + (elements_closePA ? minusXpos : 0) + (495 <1000 ? 5 : 12))")
-				(bind left "isTactical ? '15' : (27 + lastomer_Xpos + (elements_closePA ? (Lastomer.all_rate > 1000 ? minusXpos : minusXpos+3) : -5)")
+				(bind left "isTactical ? '15' : (27 + lastomer_Xpos + (elements_closePA ? (Lastomer.all_rate > 1000 ? minusXpos : minusXpos+3) : -5))")
 				(bind top "isTactical ? alignTop : (alignTop + lastomer_Ypos)")
 				(fontSize = 12)
 				(textAlign = "left")

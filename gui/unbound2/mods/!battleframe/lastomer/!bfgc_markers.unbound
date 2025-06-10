@@ -66,7 +66,7 @@
 		(macro GET_UPREFS2)
         (var lastomer_showme:bool = "uPrefsBool['bfgc_lastomer_showme']")
         (var lastomer_showmeBG:bool = "uPrefsBool['bfgc_lastomer_showmeBg']")
-		(var isLastomer:bool = "Lastomer")
+		(var isLastomer:bool = "Lastomer != null")
 		
 		(var subtypeShip:str = "avatarEntity.avatar.ship.ref.ship.subtype")
 		
@@ -74,7 +74,7 @@
 		
 		
 		(var ShipType:str = "BFGC_LASTOMER_SHIPLIST[toLower(subtypeShip)]")
-		(var ShipTypeAlfa:str = "Lastomer[ShipType+'_rate']")
+		(var ShipTypeAlfa:str = "toString(Lastomer[ShipType+'_rate'])")
 		
 		(var winrateColorName:str = "
 			 Lastomer.wins_percent > 70 	? 	'purple' : 
@@ -181,7 +181,7 @@
 
 
 (def constant BFGC_WORLD_MARKERS_SETTINGS "[
-	{markerRenderer: 'BFGC_WorldShipMarker', hitTest: false, isTactical: false},				# CC.avatar
+	{markerRenderer: 'BFGC_WorldShipMarker', hitTest: false, isTactical: false}				# CC.avatar
 ]")
 
 
@@ -234,7 +234,7 @@
 		(controller $Instance
 			(bind renderer "markerSettings.markerRenderer")
 			(args _markerEntity="_markerEntity")
-			(bind enabled "_markerEntity != null")
+			(bind enabled "_markerEntity != null && markerSettings.markerRenderer != null")
 		)
 	)
 )

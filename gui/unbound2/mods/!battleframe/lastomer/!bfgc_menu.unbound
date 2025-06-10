@@ -21,8 +21,8 @@
 		(var posY:number = "(stageHeight) - 30")
 		
 		(macro GET_UPREFS2)
-		(var currentVersion:str = "uPrefsNum['bfgc_version_lastomer']")
-		(var newVersion:str = "BFGC_VERSION_LASTOMER + 0.00001")
+		(var currentVersion:str = "toString(uPrefsNum['bfgc_version_lastomer'])")
+		(var newVersion:str = "toString(BFGC_VERSION_LASTOMER + 0.00001)")
 
     )
 	(style
@@ -56,7 +56,7 @@
 		
 		(var mouse:gfx = "$datahub.getSingleComponent(CC.mouse)")
 		(var isMouseActive:bool = "mouse.active" (event "mouse.evActiveChanged"))
-		(var newVersion:str = "BFGC_VERSION_LASTOMER + 0.00001")
+		(var newVersion:str = "toString(BFGC_VERSION_LASTOMER + 0.00001)")
 	)
 	(dispatch evLastomerInfotipItemClicked args="{}" (bind trigger "isMouseActive"))
 	(bindcall externalCall 'inputMapping.onAction' "['setUserPref',{'value': newVersion, 'name': 'chatBoxWidth', 'subName': 'bfgc_version_lastomer'}]" init=false watch=false (event "evMouseDown"))
@@ -169,7 +169,6 @@
 	(style (width = 100%))
 	(controller $Repeat renderer='BFGC_LastomerOptionsItemAdapter'
 		(bind count "_itemSetting.length")
-		(bind disabled "1")
 		(args itemSetting = "_itemSetting[$index]" _isReadOnly = "_isReadOnly" _type = "_type" _baseName = "_baseName")
 	)
 )
@@ -182,8 +181,8 @@
 		(var _entity:gfx = "$datahub.getPrimaryEntity(CC.minimapOption, itemSetting.optionName)")
 		
 		(macro GET_UPREFS2)
-		(var isVisibleIF:bool =	"itemSetting.isVisibleIF ? uPrefsBool[itemSetting.isVisibleIF] : 1")
-		(var notVisibleIF:bool =	"itemSetting.notVisibleIF ? !uPrefsBool[itemSetting.notVisibleIF] : 1")
+		(var isVisibleIF:bool =	"itemSetting.isVisibleIF ? uPrefsBool[itemSetting.isVisibleIF] : true")
+		(var notVisibleIF:bool =	"itemSetting.notVisibleIF ? !uPrefsBool[itemSetting.notVisibleIF] : true")
 	)
 
 	(style
@@ -200,7 +199,6 @@
 
 	(controller $Instance (bind renderer "itemSetting.controlType")
             (bind enabled "itemSetting.controlType != 6")
-            (bind visible 0)
 			(args	_entity="_entity"
 					_itemSetting="itemSetting"
 					_enabled="!_isReadOnly && !itemSetting.isReadOnly && isVisibleIF && notVisibleIF"
