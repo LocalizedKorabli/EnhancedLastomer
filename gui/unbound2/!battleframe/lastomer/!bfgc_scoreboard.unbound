@@ -41,17 +41,19 @@
 		(var data:dict = "dataComponent ? dataComponent.data : {}" (event "dataComponent.evChanged"))
 		(bind Lastomer "data ? data.lastomer[_playerName] : BFGC_LASTOMER_DEFDATA" (event "battleDataEntity.evAdded") (event "battleDataEntity.evRemoved") (event "battleDataEntity.dataComponent.evDataChanged"))
 		
-		(var winrateColorName:str = "
-			 Lastomer.wins_percent > 61.75 	? 'purple' : 
-			 Lastomer.wins_percent > 56.84 	? 'cyan' :
-			 Lastomer.wins_percent > 51.9 	? 'green' :
-			 Lastomer.wins_percent > 47.65 	? 'lightgreen' :
-			 Lastomer.wins_percent > 42.55 	? 'yellow' :
-			 Lastomer.wins_percent > 39 	? 'red' : 
+		(var ProAlfaColorName:str = "
+ 			Lastomer.all_rate > 2450 	? 	'purple' :
+			Lastomer.all_rate > 2100 	? 	'magenta':
+			Lastomer.all_rate > 1750 	? 	'cyan' :
+			Lastomer.all_rate > 1550 	? 	'green' :
+			Lastomer.all_rate > 1350 	? 	'lime' :
+			Lastomer.all_rate > 1100 	? 	'yellow' :
+			Lastomer.all_rate > 750 	? 	'orange' :
+			Lastomer.all_rate > 0 		? 	'red' : 
 											  'white'
 		")
 		
-		(macro HEX_TO_RGB_BFLM "BFGC_LASTOMER_COLOR[winrateColorName]")
+		(macro HEX_TO_RGB_BFLM "BFGC_LASTOMER_COLOR[ProAlfaColorName]")
 		(var setColorTransform:dict = "{redOffset:colorR,greenOffset:colorG,blueOffset:colorB,alphaOffset:1}")
 		(var setColorHidden:dict = "{redOffset:96,greenOffset:96,blueOffset:96,alphaOffset:1}")
 	)
