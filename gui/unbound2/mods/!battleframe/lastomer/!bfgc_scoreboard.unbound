@@ -3,6 +3,7 @@
 									_noClanTagColor:bool=false, _isBot:bool=false, _isSuspended:bool=false, _isTextBold:bool=false, _isInPostBattle:bool=false)
 	(scope
 		(var hasMinimapMod:bool = "BFGC_VERSION_MINIMAP ? true : false")
+	)
 	(style
 		(hitTest = false)
 		(flow = "horizontal")
