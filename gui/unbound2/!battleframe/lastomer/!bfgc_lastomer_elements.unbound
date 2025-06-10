@@ -1,8 +1,3 @@
-(def css $TextShipWinRateFont ()
-	(extends $TextSecondaryBold)
-	(fontSize = 14)
-)
-
 (def element BFGC_LastomerOptionsCheckBox (_entity:gfx, _itemSetting:dict={}, _enabled:bool=true, _type:str='', _baseName:str='', _isVisibleIF:bool=true, _notVisibleIF:bool=false) layout=true
 	(scope
 		(macro GET_UPREFS2)
@@ -193,11 +188,6 @@
 	)
 		
 	(controller $Instance renderer='HotkeyIndicator'
-		(bind visible "commandId2 > 0")
-		(style 
-				(position = "absolute")
-				(marginLeft = "6px") 
-		)
 		(args
 			_commandId = "commandId2"
 			_active="toggle"
@@ -221,11 +211,6 @@
 	)
 		
 	(controller $Instance renderer='HotkeyIndicator'
-		(bind visible "commandId3 > 0")
-		(style 
-				(position = "absolute")
-				(marginLeft = "6px") 
-		)
 		(args
 			_commandId = "commandId3"
 			_active="toggle"
@@ -240,7 +225,6 @@
 
 (def element BFGC_LastomerOptionsSlider (_itemSetting:dict, _enabled:bool=true, _isVisibleIF:bool=false) layout=true
     (scope
-        (var enabled:bool = "1")
 		(macro GET_UPREFS2)
 		(var IDS_LOC:str = "tr('IDS_MENU_SETTINGS') != 'НАСТРОЙКИ' ? '_EN' : ''")
 
@@ -252,7 +236,7 @@
         (var textDesc:str = "_itemSetting.text")
 		
 		(var optionName:str = "'bfgc_lastomer_' + _itemSetting.optionName")
-		(bind optionName "_baseName ? ('bfgc_lastomer_' + _baseName + '_' + _itemSetting.optionName) : optionName")
+		#(bind optionName "_baseName ? ('bfgc_lastomer_' + _baseName + '_' + _itemSetting.optionName) : optionName")
 		
         (var propValue:number = "!isIn(toString(uPrefsNum[optionName]), ['null', 'undefined']) ? uPrefsNum[optionName] : _itemSetting.defaultValue")
 		

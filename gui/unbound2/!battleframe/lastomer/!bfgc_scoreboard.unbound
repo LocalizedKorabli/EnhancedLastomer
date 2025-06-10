@@ -2,7 +2,7 @@
 									_isInSameDivision:bool=false, _fontSize:number=15, _playerName:str='', _clanTag:str='', _clanTagColor:str='',
 									_noClanTagColor:bool=false, _isBot:bool=false, _isSuspended:bool=false, _isTextBold:bool=false, _isInPostBattle:bool=false)
 	(scope
-		(var hasMinimapMod:bool = "BFGC_VERSION_MINIMAP")
+		(var hasMinimapMod:bool = "BFGC_VERSION_MINIMAP ? true : false")
 	)
 	(style
 		(hitTest = false)
@@ -34,9 +34,7 @@
 		(var showInScoreboard:bool = "uPrefsBool['bfgc_lastomer_showInScoreboard'] == true || (uPrefsBool['bfgc_lastomer_showInScoreboard'] == null && BFGC_LASTOMER_OPTIONS['MAIN'][8]['isActivated'] == true)")
 		
 		
-		(var Lastomer:dict = [])
-		
-		(var isBot:bool = "avatarEntity.avatar.isBot ?: false")
+		(var Lastomer:dict = {})
 		
 		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
 		(var dataComponent:gfx = "battleDataEntity.dataComponent" (event "battleDataEntity.evAdded") (event "battleDataEntity.evRemoved"))
@@ -53,7 +51,7 @@
 											  'white'
 		")
 		
-		(macro HEX_TO_RGB "BFGC_LASTOMER_COLOR[winrateColorName]")
+		(macro HEX_TO_RGB_BFLM "BFGC_LASTOMER_COLOR[winrateColorName]")
 		(var setColorTransform:dict = "{redOffset:colorR,greenOffset:colorG,blueOffset:colorB,alphaOffset:1}")
 		(var setColorHidden:dict = "{redOffset:96,greenOffset:96,blueOffset:96,alphaOffset:1}")
 	)
@@ -102,7 +100,7 @@
 		(width = 100%)
 	)
 
-	(element BFGC_PlayerLastomerIndicator _playerName="_playerName" _isInPostBattle="_isInPostBattle"  _isBot="isBot")
+	(element BFGC_PlayerLastomerIndicator _playerName="_playerName" _isInPostBattle="_isInPostBattle"  _isBot="_isBot")
 	
 	(tf
 		(bind visible "isColoredClanTag")
