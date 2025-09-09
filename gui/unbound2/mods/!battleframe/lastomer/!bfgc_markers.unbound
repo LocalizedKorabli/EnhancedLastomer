@@ -129,7 +129,7 @@
 		(bind visible "lastomer_showmeBG")
         (.graphics
             (beginFill "0x000000" "0.3") 
-			(drawRect -1 3 144 22)
+			(drawRect -2 3 150 22)
             (endFill)
         )
 	)
