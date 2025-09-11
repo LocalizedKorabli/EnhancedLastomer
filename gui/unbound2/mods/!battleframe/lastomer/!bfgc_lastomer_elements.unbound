@@ -103,7 +103,7 @@
 										: 0")
 			(style
 				(position = "absolute")
-				(backgroundImage = "'bitmap:checkbox_over'")
+				(backgroundImage = 'url:../service_kit/buttons/check_box/over.png')
 			)
 
 			(controller $Animation
@@ -124,7 +124,7 @@
 		(bind visible "_selected && !_isWarn")
 		(style
 			(position = "absolute")
-			(backgroundImage = "'bitmap:checkbox_check'")
+			(backgroundImage = 'url:../service_kit/buttons/check_box/check_icon.png')
 		)
 	)
 
