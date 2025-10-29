@@ -1,0 +1,11 @@
+<meta.xml>
+    <meta>
+        <id>BattleframeLastomer</id>
+        <version>25.11.0</version>
+        <name>Ластомер</name>
+    </meta>
+    <elements>
+        <element action="add_before" target="OwnShipHealth">BattleframeMenu</element>
+        <element action="add_before" target="POIIndicatorsContainer">BattleframeLastomer</element>
+    </elements>
+</meta.xml>
