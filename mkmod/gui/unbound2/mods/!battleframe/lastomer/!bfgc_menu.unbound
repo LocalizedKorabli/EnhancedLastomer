@@ -1,0 +1,224 @@
+# ==========================================================
+# Меню настроек модификации
+# В ЭТОМ ФАЙЛЕ НИЧЕГО МЕНЯТЬ И ТРОГАТЬ НЕ СЛЕДУЕТ!
+# ==========================================================
+(def constant BFGC_LASTOMER_PIN_SETTINGS
+	{
+		'left'		: "DEFAULT_PINS_OFFSETS",
+		'right'		: "DEFAULT_PINS_OFFSETS",
+		'top'		: {pinTop: "-XXS", pinBottom: 0, pinLeft: 0, pinRight: 0},
+		'bottom'	: {pinTop: 0, pinBottom: "XXS", pinLeft: 0, pinRight: 0}
+	}
+)
+
+
+(def element BattleframeMenu() layout=true
+    (scope
+		(var stageComponent:gfx = "$datahub.getSingleEntity(CC.stage).stage")
+		(var stageWidth:number  = "stageComponent.width"  (event "stageComponent.evStageSizeChanged"))
+		(var stageHeight:number = "stageComponent.height" (event "stageComponent.evStageSizeChanged"))
+		(var posX:number = "(stageWidth  - stageWidth + 30)")
+		(var posY:number = "(stageHeight) - 30")
+		
+		(macro GET_UPREFS2)
+		(var currentVersion:str = "toString(uPrefsNum['bfgc_version_lastomer'])")
+		(var newVersion:str = "toString(BFGC_VERSION_LASTOMER + 0.00001)")
+
+    )
+	(style
+		(position = "absolute")
+		(bind paddingTop "posY + 10")
+		(bind paddingLeft 20)
+	)
+	
+	
+    (block
+		(bind visible "currentVersion != newVersion")
+		(style 
+			(position = "absolute") (bind left "8px") (bind top "-8px")
+			(bind backgroundImage "'symbol:contextGuidingTipAnimation'")
+			(bind scaleX "10")
+			(bind scaleY "10")
+			(bind alpha "0.5")
+		)
+		(bind colorTransform "{ redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:1,redOffset:255,greenOffset:120,blueOffset:0,alphaOffset:1 }")
+	)
+
+	(element BFGC_LastomerOptionsButton)
+)
+
+(def element BFGC_LastomerOptionsButton () layout=true
+	(scope
+		(event evLastomerInfotipItemClicked)
+		
+		(macro MOUSE_HANDLER_SCOPE)
+		(var infotipVisible:bool = false)
+		
+		(var mouse:gfx = "$datahub.getSingleComponent(CC.mouse)")
+		(var isMouseActive:bool = "mouse.active" (event "mouse.evActiveChanged"))
+		(var newVersion:str = "toString(BFGC_VERSION_LASTOMER + 0.00001)")
+	)
+	(dispatch evLastomerInfotipItemClicked args="{}" (bind trigger "isMouseActive"))
+	(bindcall externalCall 'inputMapping.onAction' "['setUserPref',{'value': newVersion, 'name': 'chatBoxWidth', 'subName': 'bfgc_version_lastomer'}]" init=false watch=false (event "evMouseDown"))
+	(macro MOUSE_EVENTS_DISPATCHER)
+	
+	(controller $Tooltip
+		(renderer='BFGC_ShipLastomerOptionsInfotip')
+		
+		(bindcall show animation={duration:0.1, easing:"Easing.cubic_in", from:{alpha:1}, to:{alpha:1}} on='leftClick')
+		(bindcall hide animation={duration:0.1, easing:"Easing.cubic_out", from:{alpha:1}, to:{alpha:0}} on='evClickOutside' (event "evLastomerInfotipItemClicked"))
+		
+
+		(bind infotipVisible "true" init=false on='evShow')
+		(bind infotipVisible "false" init=false on='evHide')
+		(macro MINIMAP_TOOLTIP_COMMON_PARAMS)
+	)
+	
+	(element ButtonSettingsSmall
+		(style
+			(position = "absolute") (right = "-20px") (top = "-40px")
+			(bind alpha "1")
+		)
+	)
+)
+
+(def element BFGC_ShipLastomerOptionsInfotip () layout=true
+	(scope
+		(event evLastomerInfotipItemClicked)
+		(macro MOUSE_HANDLER_SCOPE)		
+		(event pinPositionChanged)	
+		(var pinParams:dict = "BFGC_LASTOMER_PIN_SETTINGS['bottom']" watch=false)
+		(bind pinParams "BFGC_LASTOMER_PIN_SETTINGS[$event.pinPosition]" init=false (event "pinPositionChanged"))
+
+		(var offsetTop:number = "0" watch=false)
+		(bind offsetTop "18" init=false (event "pinPositionChanged"))
+	)
+		(dispatch evLastomerInfotipItemClicked dir="EventDirection.UP" init=false watch=false (event "evClicked"))
+									
+
+		(style (position = "absolute") (bind left "10px") (bind top "0px"))
+
+	(macro TOOLTIP_SYSTEM_DEFAULT_BACKGROUND "true")
+
+	(element TOOLTIP_SYSTEM_DEFAULT_CONTAINER
+		(style (width = "auto"))
+		(element "'BFGC_LastomerOptionsContent'" "false")
+	)
+	(element InfotipPins "pinParams" "!isHighContrast")
+)
+
+
+
+
+(def element BFGC_LastomerOptionsContent (_isReadOnly:bool) layout=true
+	(hblock
+	
+		(element BFGC_LastomerOptionsBlock1 _isReadOnly="_isReadOnly")
+		(block
+			(style (height = 100%))
+			(controller $Instance renderer='TooltipSystemVerticalDivider')
+		)
+		(element BFGC_LastomerOptionsBlock2 _isReadOnly="_isReadOnly")
+	)
+	(element TooltipSystemHorizontalDivider)
+	
+    (controller $Instance (renderer = 'BFGC_HotkeyIndicatorWithText')
+        (bind enabled "1")
+		(args
+			commandId = "Cmd['CMD_ICONS']"
+			commandId2 = "Cmd['CMD_VOICE_CHAT_TALK']"
+			commandId3 = "Cmd['CMD_ICONS']"
+			toggle=true
+			fxOnDown=false
+		)
+    )
+)
+
+
+(def element BFGC_LastomerOptionsBlock1 (_isReadOnly:bool) layout=true
+	(style (width = "360px"))
+	
+	(element TooltipSystemHeaderSubheaderText
+			_headerText="tr('IDS_BFGC_LM_MENU_MAIN')"
+			_unifiedStatus="SC.Ui_styles.UNIFIED_STATUS.DEFAULT"
+	)
+	(element TooltipSystemHorizontalDivider)
+	(element BFGC_LastomerOptionsSection "BFGC_LASTOMER_OPTIONS['MAIN']" "_isReadOnly" "'main'")
+)
+
+(def element BFGC_LastomerOptionsBlock2 (_isReadOnly:bool) layout=true
+	(style (width = "260px"))
+	(element TooltipSystemHeaderSubheaderText
+			_headerText="tr('IDS_BFGC_LM_MENU_EXT')"
+			_unifiedStatus="SC.Ui_styles.UNIFIED_STATUS.DEFAULT"
+	)
+	(element TooltipSystemHorizontalDivider)
+	(element BFGC_LastomerOptionsSection "BFGC_LASTOMER_OPTIONS['EXT']" "_isReadOnly" "'ext'")
+	(element TooltipSystemHorizontalDivider)
+	
+	(element TooltipSystemHeaderSubheaderText
+			_headerText="tr('IDS_BFGC_LM_MENU_CALIBRATION')"
+			_unifiedStatus="SC.Ui_styles.UNIFIED_STATUS.DEFAULT"
+	)
+	(element TooltipSystemHorizontalDivider)
+	(element BFGC_LastomerOptionsSection "BFGC_LASTOMER_OPTIONS['CALIBRATION']" "_isReadOnly" "'calibration'")
+)
+
+
+(def element BFGC_LastomerOptionsSection (_itemSetting:gfx, _isReadOnly:bool, _type:str, _baseName:str) layout=true
+	(style (width = 100%))
+	(controller $Repeat renderer='BFGC_LastomerOptionsItemAdapter'
+		(bind count "_itemSetting.length")
+		(args itemSetting = "_itemSetting[$index]" _isReadOnly = "_isReadOnly" _type = "_type" _baseName = "_baseName")
+	)
+)
+
+
+
+
+(def element BFGC_LastomerOptionsItemAdapter (itemSetting:dict, _isReadOnly:bool, _type:str, _baseName:str) layout=true
+	(scope
+		(var _entity:gfx = "$datahub.getPrimaryEntity(CC.minimapOption, itemSetting.optionName)")
+		
+		(macro GET_UPREFS2)
+		(var isVisibleIF:bool =	"itemSetting.isVisibleIF ? uPrefsBool[itemSetting.isVisibleIF] : true")
+		(var notVisibleIF:bool =	"itemSetting.notVisibleIF ? !uPrefsBool[itemSetting.notVisibleIF] : true")
+	)
+
+	(style
+		(width = 100%)
+		#(bind marginLeft "itemSetting.isVisibleIF ? 10px : 0")
+		#(bind scaleX "itemSetting.isVisibleIF ? 0.9 : 1")
+		#(bind scaleY "itemSetting.isVisibleIF ? 0.9 : 1")
+	)
+	
+	(element TooltipSystemHorizontalDivider (style (paddingLeft = "-10px") (paddingRight = "-10px") )
+                (bind visible "itemSetting.controlType == 'divider'"))
+	
+
+
+	(controller $Instance (bind renderer "itemSetting.controlType")
+            (bind enabled "itemSetting.controlType != 6")
+			(args	_entity="_entity"
+					_itemSetting="itemSetting"
+					_enabled="!_isReadOnly && !itemSetting.isReadOnly && isVisibleIF && notVisibleIF"
+					_type="_type"
+					_baseName = "_baseName"
+					_isVisibleIF = "isVisibleIF"
+					_notVisibleIF = "notVisibleIF"
+			)
+	)
+	
+	
+	
+	(controller $Instance (bind renderer "itemSetting.controlType")
+            (bind enabled "itemSetting.controlType == 6")
+			(args 
+				_itemSetting="itemSetting"
+				_enabled="itemEnabled" 
+				_baseName = "_baseName"
+				_isVisibleIF = "isVisibleIF"
+				_notVisibleIF = "notVisibleIF"
+			)
+	)
+)

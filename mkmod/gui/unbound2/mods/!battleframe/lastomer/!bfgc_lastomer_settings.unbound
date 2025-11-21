@@ -1,0 +1,235 @@
+#----------------------
+#	Текущая итерация Ластомера
+#----------------------
+(def constant BFGC_VERSION_LASTOMER "2.0")
+
+
+#----------------------
+#	Установка цветовой палитры
+#----------------------
+(def constant BFGC_LASTOMER_COLOR	
+{
+	'purple': 		'0x800080',
+	'magenta': 		'0xEB00EB',
+	'cyan': 		'0x47CFE3',
+	'green': 		'0x2EAF32',
+	'lime': 		'0x7FD82E',
+	'yellow': 		'0xFFE85B',
+	'orange': 		'0xFE7903',
+	'red': 			'0xFE4D2A',	
+	'white': 		'0xEEEEEE'
+})
+#----------------------
+#	Сокращение классов
+#----------------------
+(def constant BFGC_LASTOMER_SHIPLIST	
+{
+        'destroyer': 	'em',
+        'aircarrier': 	'av',
+        'cruiser': 		'kp',
+        'battleship':	'lk',
+        'submarine': 	'pl'
+})
+
+(def constant BFGC_LASTOMER_DEFDATA
+ {
+       'id': 0,
+       'name': '-',
+       'ishidden': true,
+       'clan_id': 0,
+       'clan_tag': '',
+       'karma': 0,
+       'error': 0,
+       'all_battles_count': 0,
+       'all_wins': 0,
+       'all_survived': 0,
+       'all_damage': 0,
+       'all_experience': 0,
+       'all_rate': 0,
+       'all_kill_dead': 0,
+       'av_rate': 0,
+       'lk_rate': 0,
+       'kp_rate': 0,
+       'em_rate': 0,
+       'av_battles_count': 0,
+       'lk_battles_count': 0,
+       'kp_battles_count': 0,
+       'em_battles_count': 0,
+       'av_battle_damage': 0,
+       'lk_battle_damage': 0,
+       'kp_battle_damage': 0,
+       'em_battle_damage': 0,
+       'wins_percent': 0
+ })
+
+##########################
+(def constant BFGC_SETTINGS_LASTOMER_TYPE {
+	CHECKBOX_PREFS: 'BFGC_LastomerOptionsCheckBox',
+	SLIDER_PREFS: 'BFGC_LastomerOptionsSlider',
+	DIVIDER: 'TooltipSystemHorizontalDivider'
+})
+##########################
+(def macro HEX_TO_RGB_BFLM (_colorNUM:expression, _name:expression='color')
+	(var name = "_name + 'R'" type=number value="(_colorNUM >> 16) & 255")
+	(var name = "_name + 'G'" type=number value="(_colorNUM >> 8) & 255")
+	(var name = "_name + 'B'" type=number value="(_colorNUM) & 255")
+)
+##########################
+(def macro GET_UPREFS2 ()
+	(var userPrefsEntity:gfx =  "$datahub.getSingleEntity(CC.userPrefs)")
+	(var _userPrefs:gfx = "userPrefsEntity.userPrefs.userPrefs" (event "userPrefsEntity.userPrefs.evUserPrefsChanged"))
+ 	(var uPrefsNum:dict  = "_userPrefs.chatBoxWidth ?: {}" (event "userPrefsEntity.userPrefs.evUserPrefsChanged"))
+ 	(var uPrefsBool:dict  = "_userPrefs.elementsGroupExpand ?: {}" (event "userPrefsEntity.userPrefs.evUserPrefsChanged"))
+)
+##########################
+
+
+(def constant BFGC_LASTOMER_OPTIONS {
+	'MAIN':
+	[
+		{
+			optionName: 'showicons',
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.CHECKBOX_PREFS",
+			isReadOnly: false,
+			text:'IDS_BFGC_LM_SHOWICONS',
+			tooltip: true
+		},
+		{
+			optionName: 'icons2data',
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.CHECKBOX_PREFS",
+			isReadOnly: false,
+			isWarn: false,
+			isVisibleIF: 'bfgc_lastomer_showicons',
+			text:'IDS_BFGC_LM_ICONS2DATA',
+			isActivated: true,
+			tooltip: true
+		},
+		{
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.DIVIDER",
+		},
+		{
+			optionName: 'showOnAlt',
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.CHECKBOX_PREFS",
+			isReadOnly: false,
+			isWarn: false,
+			text:'IDS_BFGC_LM_SHOWONALT',
+			tooltip: true
+		},
+		{
+			optionName: 'showOnTactical',
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.CHECKBOX_PREFS",
+			isReadOnly: false,
+			isWarn: false,
+			text:'IDS_BFGC_LM_SHOWONTACTICAL',
+			tooltip: true
+		},
+		{
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.DIVIDER",
+		},
+		{
+			optionName: 'showme',
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.CHECKBOX_PREFS",
+			isReadOnly: false,
+			isWarn: false,
+			text:'IDS_BFGC_LM_SHOWME',
+			tooltip: true
+		},
+		{
+			optionName: 'showmeBg',
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.CHECKBOX_PREFS",
+			isReadOnly: false,
+			isWarn: false,
+			isVisibleIF: 'bfgc_lastomer_showme',
+			text:'IDS_BFGC_LM_SHOWMEBG',
+			tooltip: true
+		},
+		{
+			optionName: 'showInScoreboard',
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.CHECKBOX_PREFS",
+			isReadOnly: false,
+			isWarn: false,
+			isActivated: true,
+			text:'IDS_BFGC_LM_SHOWINSCOREBOARD_PR',
+			tooltip: true
+		},
+		{
+			optionName: 'roundWR',
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.CHECKBOX_PREFS",
+			isReadOnly: false,
+			isWarn: false,
+			text:'IDS_BFGC_LM_CLB_ROUNDWR',
+			tooltip: true
+		}
+	],
+	'EXT':
+	[
+		{
+			optionName: 'statsOpacity', 
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.SLIDER_PREFS",
+			minValue: 30, 
+			maxValue: 100,
+			defaultValue: 100,
+			controlStyle: 'defaultStyle',
+			isReadOnly: false,
+			disabledMenuModes: false,
+			text:'IDS_BFGC_LM_DATAOPACITY'
+		},
+		{
+			optionName: 'stats2Opacity', 
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.SLIDER_PREFS",
+			minValue: 30, 
+			maxValue: 100,
+			defaultValue: 100,
+			controlStyle: 'defaultStyle',
+			isReadOnly: false,
+			disabledMenuModes: false,
+			text:'IDS_BFGC_LM_DATA2OPACITY'
+		},
+		{
+			optionName: 'stats2Scale', 
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.SLIDER_PREFS",
+			minValue: 70, 
+			maxValue: 170,
+			defaultValue: 120,
+			controlStyle: 'defaultStyle',
+			isReadOnly: false,
+			disabledMenuModes: false,
+			text:'IDS_BFGC_LM_DATA2SCALE'
+		}
+	],
+	'CALIBRATION':
+	[
+		{
+			optionName: 'calibration',
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.CHECKBOX_PREFS",
+			isReadOnly: false,
+			text:'IDS_BFGC_LM_CALIBRATION',
+			tooltip: true
+		},
+		{
+			optionName: 'Xpos', 
+			isVisibleIF: 'bfgc_lastomer_calibration',
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.SLIDER_PREFS",
+			minValue: -19, 
+			maxValue: 1,
+			defaultValue: 1,
+			controlStyle: 'defaultStyle',
+			isReadOnly: false,
+			disabledMenuModes: false,
+			text:'IDS_BFGC_LM_CLB_XPOS'
+		},
+		{
+			optionName: 'Ypos', 
+			isVisibleIF: 'bfgc_lastomer_calibration',
+			controlType: "BFGC_SETTINGS_LASTOMER_TYPE.SLIDER_PREFS",
+			minValue: -50, 
+			maxValue: 0,
+			defaultValue: 0,
+			controlStyle: 'defaultStyle',
+			isReadOnly: false,
+			disabledMenuModes: false,
+			text:'IDS_BFGC_LM_CLB_YPOS'
+		}
+	]
+})
+

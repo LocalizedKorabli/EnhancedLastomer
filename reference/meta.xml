@@ -6,6 +6,6 @@
     </meta>
     <elements>
         <element action="add_before" target="OwnShipHealth">BattleframeMenu</element>
-        <element action="add_before" target="MarkersContainer">BattleframeLastomer</element>
+        <element action="add_before" target="POIIndicatorsContainer">BattleframeLastomer</element>
     </elements>
 </meta.xml>

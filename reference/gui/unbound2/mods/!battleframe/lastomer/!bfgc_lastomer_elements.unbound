@@ -1,0 +1,332 @@
+(def element BFGC_LastomerOptionsCheckBox (_entity:gfx, _itemSetting:dict={}, _enabled:bool=true, _type:str='', _baseName:str='', _isVisibleIF:bool=true, _notVisibleIF:bool=false) layout=true
+	(scope
+		(macro GET_UPREFS2)
+		(var IDS_LOC:str = "tr('IDS_MENU_SETTINGS') != 'НАСТРОЙКИ' ? '_EN' : ''")
+		
+        (var avatarEntity:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
+		(var refShip:gfx = "avatarEntity.avatar.ship.ref.ship")
+		
+		
+       # (var propValue:number = "!isIn(toString(uPrefsNum[optionName]), ['null', 'undefined']) ? uPrefsNum[optionName] : _itemSetting.defaultValue")
+		(var optionName:str = "'bfgc_lastomer_' + _itemSetting.optionName")
+		(bind optionName "_baseName ? ('bfgc_lastomer_' + _baseName + '_' + _itemSetting.optionName) : optionName")
+		
+		
+        (var textPropEntity:gfx = "$datahub.getPrimaryEntity(CC.parameter, '' + avatarEntity.id + '_' + _itemSetting.optionName)")
+        (var textPropParameter:number = "textPropEntity.parameter.currentValue" (event "textPropEntity.parameter.evChanged"))
+
+		(macro MOUSE_HANDLER_SCOPE)
+		(var hasTooltip:bool = "_itemSetting.tooltip")
+		
+		
+		(var isActivated:bool = "uPrefsBool[optionName] == true || (uPrefsBool[optionName] == null && _itemSetting.isActivated)")
+	)
+	
+	(bind visible "_isVisibleIF && _notVisibleIF")
+			
+	(controller $Tooltip
+		(bind enabled "hasTooltip")
+		(renderer = 'DescriptionTooltip')
+ 		(args _text="tr(_itemSetting.text + '_DESC' + IDS_LOC)")
+		(align="top|right")
+		(offset=[0, 20])
+		(screenBoundsOffset={left:10, top:10, right:10, bottom:10})
+		(macro SIMPLE_TOOLTIP_ANIMATION)
+	)
+	(macro SOUND_HANDLER "'default_checkbox'")
+
+	(bindcall externalCall 'inputMapping.onAction' "['setUserPref', {'value': !(isActivated), 'name': 'elementsGroupExpand', 'subName': optionName}]" init=false watch=false (event "evMouseDown"))
+	
+	(style 
+	(flow = "Flow.HORIZONTAL") 
+	(width = "100%") 
+	(align = "middle")
+	(bind marginTop "$index > 0 ? S : 0")
+	)
+
+	
+	(element BFGC_LastomerCheckBoxNoLabel
+			_selected="isActivated"
+			_enabled="_enabled"
+			_isWarn="_itemSetting.isWarn"
+			_rollOver="rollOver"
+			_interactive="_enabled"
+	)
+	
+
+	(block
+		(style (width = "100%") (marginLeft = "S") (marginTop = -3px))
+		(tf
+			(class $TextDefaultNM)
+			(bind alpha "_enabled ? (rollOver && !(mouseDown) ? TA : TC) : TEXT_PREVIEW_ALPHA")
+			(style (width = "100%") (textColor = "0xFFFFFF") (multiline = true))
+			(text = "tr(_itemSetting.text + IDS_LOC)")
+		)
+	)
+
+	(macro MOUSE_HANDLER "_enabled")
+
+	(element TooltipSystemHorizontalDivider
+		(bind visible "_itemSetting.optionName == 'calibration'"))
+)
+
+
+(def element BFGC_LastomerCheckBoxNoLabel (_selected:bool, _enabled:bool=true, _isWarn:bool=false, _interactive:bool=true, _rollOver:bool=false) layout=true
+	(scope
+		(macro MOUSE_HANDLER_SCOPE "'cb_'")
+
+		(var privRollOver:bool = "cb_rollOver || _rollOver")
+	)
+
+	(style (width = "20px") (height = "20px"))
+
+
+	
+	(block
+		(bind visible "_isWarn")
+		(style
+			(backgroundImage = "'url:../service_kit/unified_status_icons/icon_attention.png'")
+		)
+	)
+	
+	(block
+		(bind visible "_interactive && !_isWarn")
+
+		(style
+			(backgroundImage = "'bitmap:checkbox_up'")
+		)
+
+		
+		(block
+			(bind alpha "	_enabled || _isWarn	? (privRollOver ? 0.7 : 0) :
+							_selected	? 0.7
+										: 0")
+			(style
+				(position = "absolute")
+				(backgroundImage = 'url:../service_kit/buttons/check_box/over.png')
+			)
+
+			(controller $Animation
+				(bindcall play
+					duration=0.3
+					from={alpha: 0}
+					to={alpha: 0.7}
+					reverse="!(privRollOver)"
+					easing="Easing.line"
+					(bind trigger "privRollOver")
+				)
+			)
+		)
+	)
+
+	
+	(block
+		(bind visible "_selected && !_isWarn")
+		(style
+			(position = "absolute")
+			(backgroundImage = 'url:../service_kit/buttons/check_box/check_icon.png')
+		)
+	)
+
+	(macro MOUSE_HANDLER "_enabled" "'cb_'")
+)
+
+
+
+
+(def element BFGC_HotkeyIndicatorWithText (commandId:number, commandId2:number, commandId3:number, toggle:bool=false, fxOnDown:bool=true) layout=true
+	(scope
+		(var textStyleClass:str = "null")
+		(macro GET_UPREFS2)
+		(var IDS_LOC:str = "tr('IDS_MENU_SETTINGS') != 'НАСТРОЙКИ' ? '_EN' : ''")
+	)
+	(bind visible "1")
+	
+	(style
+		(flow = "Flow.HORIZONTAL")
+		(width = "100%")
+		(marginBottom = "0px")
+	)
+
+	(block
+		(style
+			(marginLeft = "XS")
+			(marginRight = "XS")
+			(height = 100%)
+			(align = "center|middle")
+		)
+			
+		(tf
+            (class $TextDefaultNM)
+			(text = "tr('IDS_BFGC_LM_DATA_PRESS' + IDS_LOC)")
+		)
+	)
+		
+	(controller $Instance renderer='HotkeyIndicator'
+		(args
+			_commandId = "commandId"
+			_active="toggle"
+			_size="1"
+			_fxOnDown="fxOnDown"
+		)
+	)
+
+	(block
+		(bind visible "commandId2")
+		(style
+			(marginLeft = "XS")
+			(marginRight = "XS")
+			(height = 100%)
+			(align = "center|middle")
+		)
+		(tf
+			(class $TextDefaultBoldNM)
+			(class $FontEnableReadability)
+			(bind class "textStyleClass")
+			(bind text "'+'")
+		)
+	)
+		
+	(controller $Instance renderer='HotkeyIndicator'
+		(args
+			_commandId = "commandId2"
+			_active="toggle"
+			_size="1"
+			_fxOnDown="fxOnDown"
+		)
+	)
+
+	(block
+		(style
+			(marginLeft = "XS")
+			(marginRight = "XS")
+			(height = 100%)
+			(align = "center|middle")
+		)
+			
+        (tf
+            (class $TextDefaultNM)
+			(text = "tr('IDS_BFGC_LM_DATA_PRESS2' + IDS_LOC)")
+        )
+	)
+		
+	(controller $Instance renderer='HotkeyIndicator'
+		(args
+			_commandId = "commandId3"
+			_active="toggle"
+			_size="1"
+			_fxOnDown="fxOnDown"
+		)
+	)
+)
+
+
+
+
+(def element BFGC_LastomerOptionsSlider (_itemSetting:dict, _enabled:bool=true, _isVisibleIF:bool=false) layout=true
+    (scope
+		(macro GET_UPREFS2)
+		(var IDS_LOC:str = "tr('IDS_MENU_SETTINGS') != 'НАСТРОЙКИ' ? '_EN' : ''")
+
+        (event evSliderValueChanged)
+		
+		
+		#(var isVisibleIF:bool = "!(_isVisibleIF) || (_isVisibleIF && uPrefsBool[_isVisibleIF])")
+		
+        (var textDesc:str = "_itemSetting.text")
+		
+		(var optionName:str = "'bfgc_lastomer_' + _itemSetting.optionName")
+		#(bind optionName "_baseName ? ('bfgc_lastomer_' + _baseName + '_' + _itemSetting.optionName) : optionName")
+		
+        (var propValue:number = "!isIn(toString(uPrefsNum[optionName]), ['null', 'undefined']) ? uPrefsNum[optionName] : _itemSetting.defaultValue")
+		
+    )
+		(bind visible "_isVisibleIF")
+
+	(bindcall externalCall 'inputMapping.onAction' "['setUserPref', {'value': $event.value + _itemSetting.minValue, 'name': 'chatBoxWidth', 'subName': optionName}]" init=false watch=false (event "evSliderValueChanged"))
+
+    (style 
+	(height = "42px") 
+	(align = "middle") 
+	(marginLeft = "0px")
+	(marginTop = "0px")
+	)
+    (block
+        (tf
+            (class $TextDefaultNM)
+            (style (marginBottom = "6px"))
+            (bind text "textDesc")
+        )
+		(element DefaultSlider
+		_value = "propValue - _itemSetting.minValue"
+		_intervalsCount = "_itemSetting.maxValue - _itemSetting.minValue"
+			_width = 250
+		)
+    )
+)
+
+
+
+(def element BFGC_DefaultSlider (_value:number, _minValue:number, _intervalsCount:number, _unitsInStepInterval:number=1, _width:number=200)
+	(scope
+		(event evSliderValueChanged)
+		(event evSliderValueChangedForTrack)
+
+		(event evRollOver)
+		(event evRollOut)
+		(event evMouseDown)
+		(event evStageMouseUp)
+
+		(event evSliderThumbMouseDown)
+
+		(event evSliderValueChangedInternal)
+		(var curValue:number = "$event ? $event.newValue : _value" (event "evSliderValueChangedInternal"))
+		
+		#(var curValue:number = "calcValue > (_intervalsCount - _minValue) ? 100 : calcValue < _minValue ? _minValue : calcValue" (event "evSliderValueChangedInternal"))
+
+		(var rollOver:bool = "$event.isOver" init=false watch=false (event "evRollOver") (event "evRollOut"))
+		(var isMouseDown:bool = "$event.isDown" init=false watch=false (event "evMouseDown") (event "evSliderThumbMouseDown") (event "evStageMouseUp"))
+
+		
+		(var ctRollOver:dict = "{ redMultiplier: 1,	greenMultiplier: 1,	blueMultiplier: 1,	alphaMultiplier: 1,
+								  redOffset: 15,	greenOffset: 15,	blueOffset: 15,		alphaOffset: 0 }")
+		(var ctDown:dict = "	{ redMultiplier: 1,	greenMultiplier: 1,	blueMultiplier: 1,	alphaMultiplier: 1,
+								  redOffset: -20,	greenOffset: -20,	blueOffset: -20,	alphaOffset: 0 }")
+	)
+		
+	(dispatch evRollOver		on='rollOver'	args="{isOver: true}")
+	(dispatch evRollOut			on='rollOut'	args="{isOver: false}")
+
+	(dispatch evStageMouseUp	on='stageMouseUp'	args="{isDown: false}")
+	(dispatch evMouseDown		on='mouseDown'		args="{isDown: true}")
+
+	(bind colorTransform "	rollOver && !isMouseDown	? ctRollOver :
+							isMouseDown					? ctDown
+														: CT_NONE")
+
+	(dispatch evSliderValueChanged	args="{value: curValue}" dir="EventDirection.UP" on='addedToStage' (event "evSliderValueChangedInternal"))
+	(dispatch evSliderValueChangedForTrack	args="{value: curValue, intervalsCount: _intervalsCount}" dir="EventDirection.DOWN" (event "evSliderValueChanged"))
+
+	(bindcall externalCall 'sound.playSetSoundDirect' "['slider', SoundEvent.OVER]" init=false watch=false on='rollOver')
+	(bindcall externalCall 'sound.playSetSoundDirect' "['slider', SoundEvent.PRESS]" init=false watch=false on='mouseDown')
+	(bindcall externalCall 'sound.playSetSoundDirect' "['slider', SoundEvent.CHANGE]" init=false watch=false  (event "evSliderValueChangedInternal"))
+
+
+	(scroll_bar
+		(style (width = "_width"))
+
+		(bind maximum "_intervalsCount")	
+		(bind value "curValue")				
+	
+		(singleStep = 1)
+		(scrollDuration = 2)
+
+		(orientation = "horizontal")
+		(alignThumbToBorders = false)
+
+		(thumb = 'DefaultSliderThumb')
+		(track = 'DefaultSliderTrack')
+
+		(dispatch evSliderValueChangedInternal on='valueChanged' dir="EventDirection.NONE")
+	)
+)

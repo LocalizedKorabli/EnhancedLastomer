@@ -1,0 +1,240 @@
+(def layout BattleframeLastomer ()
+	(scope
+		(var stageComponent:gfx = "$datahub.getSingleEntity(CC.stage).stage")
+		(var stageWidth:number = "stageComponent.width" (event "stageComponent.evStageSizeChanged"))
+		(var stageHeight:number = "stageComponent.height" (event "stageComponent.evStageSizeChanged"))
+
+		(var markersCollection:gfx = "$datahub.getCollection(CC.worldMarker)")
+		
+		
+        (var avatarEntity:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
+		(var isBot:bool = "avatarEntity.avatar.isBot ?: false")
+		(var playerName:str = "avatarEntity.avatar.pureName")
+
+		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
+		(var dataComponent:gfx = "battleDataEntity.dataComponent" (event "battleDataEntity.evAdded") (event "battleDataEntity.evRemoved"))
+ 		(var data:dict = "dataComponent ? dataComponent.data : {}" (event "dataComponent.evChanged"))
+ 		(var Lastomer:dict = "data 
+ 								? data.lastomer[playerName] 
+ 									? data.lastomer[playerName].ishidden
+ 										? BFGC_LASTOMER_DEFDATA
+ 										: data.lastomer[playerName]
+ 									: BFGC_LASTOMER_DEFDATA
+ 								: BFGC_LASTOMER_DEFDATA")
+ 								
+	)
+
+	(style
+		(position = "absolute")
+		(bind width "stageWidth")
+		(bind height "stageHeight")
+	)
+
+	(controller $Repeat renderer='BFGC_WorldMarkerItem'
+		(bind count "markersCollection.items.length" watch=false (event "markersCollection.evAdded"))
+		(bindcall removeChildAt "$event[1]" (event "markersCollection.evRemoved"))
+		(args "markersCollection")
+	)
+
+	
+    (controller $Instance (renderer = 'BFGC_MyStatPanel')
+        (args Lastomer="Lastomer" avatarEntity="avatarEntity")
+    )
+)
+
+(def css $FontDropShadowBLK ()
+	(filters 
+		(dropShadow 
+			(distance = 1)
+			(angle = 90)
+			(color = 0x000000)
+			(alpha = 0.7)
+			(blurX = 3.8)
+			(blurY = 3.8)
+			(strength = 1.5)
+			(quality = 3)
+		)
+	)
+)
+(def css $TextLastomerMessageStyle()
+	(extends $WorldMarkerTextItemShadowFilterBF)
+	(extends $FontDropShadowBLK)
+)
+
+(def element BFGC_MyStatPanel(Lastomer:dict, avatarEntity:gfx) layout=true
+	(scope      
+		(macro GET_UPREFS2)
+        (var lastomer_showme:bool = "uPrefsBool['bfgc_lastomer_showme']")
+        (var lastomer_showmeBG:bool = "uPrefsBool['bfgc_lastomer_showmeBg']")
+		(var isLastomer:bool = "Lastomer != null")
+		
+		(var subtypeShip:str = "avatarEntity.avatar.ship.ref.ship.subtype")
+		
+		(var isSubmarine:bool = "subtypeShip == 'Submarine'")
+		
+		
+		(var ShipType:str = "BFGC_LASTOMER_SHIPLIST[toLower(subtypeShip)]")
+		(var ShipTypeAlfa:str = "toString(Lastomer[ShipType+'_rate'])")
+		
+		(var winrateColorName:str = "
+			 Lastomer.wins_percent > 70 	? 	'purple' : 
+			 Lastomer.wins_percent > 62 	? 	'magenta' :
+			 Lastomer.wins_percent > 58 	? 	'cyan' :
+			 Lastomer.wins_percent > 54 	? 	'green' :
+			 Lastomer.wins_percent > 50 	? 	'lime' :
+			 Lastomer.wins_percent > 46 	? 	'yellow' :
+			 Lastomer.wins_percent > 42 	? 	'orange' :
+			 Lastomer.wins_percent > 0 		? 	'red' : 
+											 	'white'
+		")
+																								
+		(var ProAlfaColorName:str = "
+			Lastomer.all_rate > 2450 	? 	'purple' :
+			Lastomer.all_rate > 2100 	? 	'magenta':
+			Lastomer.all_rate > 1750 	? 	'cyan' :
+			Lastomer.all_rate > 1550 	? 	'green' :
+			Lastomer.all_rate > 1350	? 	'lime' :
+			Lastomer.all_rate > 1100 	? 	'yellow' :
+			Lastomer.all_rate > 750 	? 	'orange' :
+			Lastomer.all_rate > 0 		? 	'red' : 
+											'white'
+		")
+																								
+		(var ShipTypeAlfaColorName:str = "
+			 ShipTypeAlfa > 2450 	? 	'purple' :
+			 ShipTypeAlfa > 2100    ? 	'magenta':
+			 ShipTypeAlfa > 1750 	? 	'cyan' :
+			 ShipTypeAlfa > 1550 	? 	'green' :
+			 ShipTypeAlfa > 1350	? 	'lime' :
+			 ShipTypeAlfa > 1100 	? 	'yellow' :
+			 ShipTypeAlfa > 750 	? 	'orange' :
+			 ShipTypeAlfa > 0 		?	'red' : 
+										'white'
+		")
+		
+		(var WinRateColor:number = "toNumber(BFGC_LASTOMER_COLOR[winrateColorName])")
+ 		(var ProAlfaColor:number = "toNumber(BFGC_LASTOMER_COLOR[ProAlfaColorName])")
+ 		(var ShipTypeAlfaColor:number = "toNumber(BFGC_LASTOMER_COLOR[ShipTypeAlfaColorName])")
+		
+		
+		(var ShipTypeRate:number = "isSubmarine ? '-' : Lastomer[ShipType+'_rate']")
+		
+	)
+	
+	(bind visible "lastomer_showme && Lastomer && !Lastomer.ishidden")
+
+	(style
+		(position = "absolute")
+		(flow = "Flow.HORIZONTAL")
+		(paddingTop = 20)
+		(paddingLeft = 3)
+		(bind alpha "0.85")
+	)
+	(block
+		(style (position = "absolute"))
+		(bind visible "lastomer_showmeBG")
+        (.graphics
+            (beginFill "0x000000" "0.3") 
+			(drawRect -2 3 150 22)
+            (endFill)
+        )
+	)
+	(tf	
+		(class $TextLastomerMessageStyle)
+			(style
+				(bind textColor "WinRateColor")
+				(fontSize = 17)
+			)
+		(bind text "formatFloatingPoint(Lastomer.wins_percent, 2)  + '%'")
+	)
+	(tf	
+		(class $TextLastomerMessageStyle)
+		(style (fontSize = 17))
+		(text = '|')
+	)
+	(tf	
+		(class $TextLastomerMessageStyle)
+			(style
+				(bind textColor "ProAlfaColor")
+				(paddingLeft = 30)
+				(fontSize = 17)
+			)
+		(bind text "Lastomer.all_rate")
+	)
+	(tf	
+		(class $TextLastomerMessageStyle)
+		(style (fontSize = 17))
+		(text = '|')
+	)
+	(tf	
+		(class $TextLastomerMessageStyle)
+			(style
+				(bind textColor "ShipTypeAlfaColor")
+				(paddingLeft = 30)
+				(fontSize = 17)
+			)
+		(bind text "''+ShipTypeRate")
+	)
+	
+)
+
+
+
+(def constant BFGC_WORLD_MARKERS_SETTINGS "[
+	{markerRenderer: 'BFGC_WorldShipMarker', hitTest: false, isTactical: false}				# CC.avatar
+]")
+
+
+(def element BFGC_WorldMarkerItem (_collection:gfx) layout=true
+	(scope
+		(event evMarkerShow)
+		(event evMarkerHide)
+		(event evMarkerUpdate)
+
+		(var _markerEntity:gfx = "_collection.items[$index]" watch=false)
+		
+		(var cameraEntity:gfx = "$datahub.getSingleEntity(CC.camera)")
+		(var isTactical:bool = "cameraEntity.camera.isTactical" (event "cameraEntity.camera.evTacticalStateChanged"))
+
+
+		(macro GET_MARKER_ENTITY_COMPONENT 'worldMarker')
+
+		(var screenPosition:gfx = "_markerEntity ? _markerEntity.screenPosition : null" (event "_markerEntity.evAdded") (event "_markerEntity.evRemoved"))
+		(var posX:number = "screenPosition ? screenPosition.position.x : 0" (event "evMarkerUpdate"))
+		(var posY:number = "screenPosition ? screenPosition.position.y : 0" (event "evMarkerUpdate"))
+
+		(var posZ:number = "worldMarkerComponent ? worldMarkerComponent.zindex : 0" (event "worldMarkerComponent.evZindexChanged"))
+
+		(var type:number = "_markerEntity && _markerEntity.entityType ? _markerEntity.entityType.value : -1" (event "_markerEntity.evAdded") (event "_markerEntity.evRemoved"))
+		(var markerSettings:dict = "type != -1 ? BFGC_WORLD_MARKERS_SETTINGS[type] : STUB_MARKER_SETTINGS")
+
+		(var updateEnabled:bool = "screenPosition && !(screenPosition.behindCamera)" (event "evEnterFrame"))
+
+		(var showMarker:bool = "screenPosition != null")
+		(var hideMarker:bool = "!(showMarker)")
+	)
+
+	(dispatch evMarkerShow args="{}" dir="EventDirection.DOWN" (bind enabled "showMarker") (bind trigger "showMarker"))
+	(dispatch evMarkerHide args="{}" dir="EventDirection.DOWN" (bind enabled "hideMarker") (bind trigger "hideMarker"))
+	(dispatch evMarkerUpdate args={} (event "evEnterFrame") (bind enabled "updateEnabled"))
+
+	(bind visible "updateEnabled")
+
+	(style
+		(bind left "posX")
+		(bind top "posY")
+		(bind zindex "posZ")
+		(position = "absolute")
+		(align = "center|bottom")
+		(bind hitTest "markerSettings ? markerSettings.hitTest : false")
+	)
+	
+	(block
+	
+		(controller $Instance
+			(bind renderer "markerSettings.markerRenderer")
+			(args _markerEntity="_markerEntity")
+			(bind enabled "_markerEntity != null && markerSettings.markerRenderer != null")
+		)
+	)
+)
