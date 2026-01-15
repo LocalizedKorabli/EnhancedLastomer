@@ -1,0 +1,1 @@
+Extract both the 'mods' and 'res_mods' folders into [MirKorableyPath]/bin/8834875.
