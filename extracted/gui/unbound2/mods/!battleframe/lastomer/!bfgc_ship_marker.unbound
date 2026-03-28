@@ -111,10 +111,15 @@
 									: BFGC_LASTOMER_DEFDATA
 								: BFGC_LASTOMER_DEFDATA")
 		
-		(var cmdEntity:gfx = "$datahub.getPrimaryEntity(CC.commandMappingCommandName, 'CMD_VOICE_CHAT_TALK')")
+		#(var cmdEntity:gfx = "$datahub.getPrimaryEntity(CC.commandMappingCommandName, 'CMD_VOICE_CHAT_TALK')")
+		#(bind extraData "!extraData" init=false (event "!extraData ? cmdEntity.commandMappingCommand.evCall : cameraEntity.camera.evAltVisionChanged"))
+		
+		(var inputKeyComponent:dhComponent = "getPrimaryComponent(CC.inputKey, 0x2F)")
 		(var extraData:bool = "false")
-		(bind extraData "!extraData" init=false (event "!extraData ? cmdEntity.commandMappingCommand.evCall : cameraEntity.camera.evAltVisionChanged"))
+		(bind extraData "!extraData" init=false (event "!extraData ? inputKeyComponent.evKeyDown : cameraEntity.camera.evAltVisionChanged"))
 		(var isExtraData:bool = "altVision && extraData")
+		
+		
 		
 		
 	)
